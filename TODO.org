@@ -9,6 +9,7 @@
 ** Range of numbers coloring
 or top 3 get highlighted
 ** Display ETF discrepancies in endpoint
+** Link symbol to finviz chart
 ** Macro Stats Card
    - DXY, VIX
    - breadth: pct above 20SMA
@@ -41,3 +42,7 @@ or top 3 get highlighted
 insert into etf_analysis (data)
 select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json')::jsonb;
 #+end_src
+
+
+** LLM Sessions
+- =codex resume 019d8d45-16be-7410-a683-259193cf976e=

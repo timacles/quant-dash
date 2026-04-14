@@ -1,10 +1,15 @@
 [twelvedata]
 api_key = ""
 
-[database]
+[database.dev]
 host = "127.0.0.1"
+dbname = "financials_dev"
+user = "your_user"
+
+[database.prod]
+host = "your-prod-host"
 dbname = "financials"
-username = "your_user"
+user = "your_user"
 
 [server]
 host = "0.0.0.0"
