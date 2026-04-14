@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pull Stats</title>
+  <style>
+    :root {
+      --bg: #09111f;
+      --panel: #0f1b2d;
+      --panel-2: #13233a;
+      --line: rgba(148, 163, 184, 0.18);
+      --text: #e7edf7;
+      --muted: #98a7bd;
+      --accent: #7dd3fc;
+      --warn: #fbbf24;
+      --shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 26%),
+        linear-gradient(180deg, #091120 0%, #060c18 100%);
+      color: var(--text);
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    .pull-stats {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, rgba(15, 27, 45, 0.96), rgba(10, 18, 31, 0.98));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .pull-stats__title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .pull-stats__subtitle {
+      margin: 10px 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 720px;
+    }
+
+    .pull-stats__form {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .pull-stats__field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .pull-stats__field--check {
+      align-self: center;
+      padding-top: 22px;
+    }
+
+    .pull-stats__label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pull-stats__input,
+    .pull-stats__button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(8, 17, 31, 0.75);
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+    }
+
+    .pull-stats__checks {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+
+    .pull-stats__check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .pull-stats__button {
+      cursor: pointer;
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.18), rgba(56, 189, 248, 0.12));
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pull-stats__button:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .pull-stats__hint {
+      margin: 14px 0 0;
+      color: var(--warn);
+      font-size: 13px;
+    }
+
+    .pull-stats__output {
+      margin-top: 20px;
+      min-height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(8, 17, 31, 0.8);
+      padding: 18px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", monospace;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .pull-stats__form {
+        grid-template-columns: 1fr;
+      }
+
+      .pull-stats__field--check {
+        padding-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="pull-stats">
+    <h1 class="pull-stats__title">Pull Stats</h1>
+    <p class="pull-stats__subtitle">Run the existing <code>pull_stats.py</code> CLI from the browser and stream stdout and stderr into this page while it runs.</p>
+    <form class="pull-stats__form" data-pull-stats-form>
+      <div class="pull-stats__field">
+        <label class="pull-stats__label" for="symbol">Symbol</label>
+        <input class="pull-stats__input" id="symbol" name="symbol" placeholder="Optional single ETF, e.g. XLF">
+      </div>
+      <div class="pull-stats__field">
+        <label class="pull-stats__label" for="days-back">Days Back</label>
+        <input class="pull-stats__input" id="days-back" name="days_back" type="number" min="1" step="1" value="7">
+      </div>
+      <div class="pull-stats__field">
+        <label class="pull-stats__label" for="db-target">DB Target</label>
+        <input class="pull-stats__input" id="db-target" name="db_target" placeholder="Optional, e.g. dev">
+      </div>
+      <div class="pull-stats__field pull-stats__field--check">
+        <div class="pull-stats__checks">
+          <label class="pull-stats__check"><input type="checkbox" name="print_data"> Print data</label>
+          <label class="pull-stats__check"><input type="checkbox" name="desc"> Description only</label>
+        </div>
+      </div>
+      <div class="pull-stats__field">
+        <button class="pull-stats__button" type="submit">Run pull_stats.py</button>
+      </div>
+    </form>
+    <p class="pull-stats__hint">This endpoint executes the same CLI script in-process as a subprocess. Long runs will occupy one worker thread.</p>
+    <pre class="pull-stats__output" data-pull-stats-output>Waiting to start.</pre>
+  </section>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.querySelector("[data-pull-stats-form]");
+      const output = document.querySelector("[data-pull-stats-output]");
+      const button = form ? form.querySelector("button[type='submit']") : null;
+      if (!form || !output || !button) return;
+
+      function appendChunk(chunk) {
+        output.textContent += chunk;
+        output.scrollTop = output.scrollHeight;
+      }
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        button.disabled = true;
+        output.textContent = "";
+
+        const params = new URLSearchParams();
+        const formData = new FormData(form);
+        const symbol = String(formData.get("symbol") || "").trim();
+        const daysBack = String(formData.get("days_back") || "").trim();
+        const dbTarget = String(formData.get("db_target") || "").trim();
+
+        if (symbol) params.set("symbol", symbol);
+        if (daysBack) params.set("days_back", daysBack);
+        if (dbTarget) params.set("db_target", dbTarget);
+        if (formData.get("print_data")) params.set("print_data", "1");
+        if (formData.get("desc")) params.set("desc", "1");
+
+        try {
+          const response = await fetch(`/pull_stats/stream?${params.toString()}`);
+          if (!response.ok || !response.body) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          while (true) {
+            const result = await reader.read();
+            if (result.done) break;
+            appendChunk(decoder.decode(result.value, { stream: true }));
+          }
+          appendChunk(decoder.decode());
+        } catch (error) {
+          appendChunk(`\\n[error] ${error instanceof Error ? error.message : String(error)}\\n`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
