@@ -1,0 +1,26 @@
+[twelvedata]
+api_key = ""
+
+[database]
+host = "127.0.0.1"
+dbname = "financials"
+username = "your_user"
+
+[server]
+host = "0.0.0.0"
+port = 8000
+
+[site]
+title = "Quant Momentum Dashboard"
+eyebrow = "Snapshot"
+subtitle = "Be like water my friend"
+environment = "dev"
+
+[deploy.prod]
+host = "prod-host"
+remote_app_dir = "~/PROD/trading"
+backup_dir = "~/backups"
+service = "qdash.service"
+port = 8000
+backup_keep = 5
+files = ["serve_dashboard.py"]

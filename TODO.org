@@ -1,0 +1,43 @@
+#+TITLE: Quant Dash TODOs
+
+* Main 
+** [#A] Theme View Card
+   - [ ] leader/laggards
+   - [ ] theme/industry/sector
+*** theme SQL view 
+** Config endpoint
+** Range of numbers coloring
+or top 3 get highlighted
+** Display ETF discrepancies in endpoint
+** Macro Stats Card
+   - DXY, VIX
+   - breadth: pct above 20SMA
+*** bond ETFs view simpler
+- basic VOL, ret
+- remove bucket
+** add graph visualizations
+** Fix broken repo main branch
+** [#A] Deployer [0/4]
+- [ ] deploy only necessary code, not whole repo. Only main latest.
+- [ ] improve error handling
+- [ ] develop _spec_
+- [ ] dir that only does
+  =git pull origin main=
+* Later
+** industry leader stocks
+- scrape from finviz
+- by volume descending
+
+** export to json -> llm 
+   - import json -> DB from llm analysis
+   - =vw_llm_market_analysis=
+   #+begin_src sql
+       select jsonb_pretty(summary) 
+       from public.vw_llm_market_summary 
+       where date ='2026-04-08';
+   #+end_src
+   - insert LLM analysis into DB
+#+begin_src sql
+insert into etf_analysis (data)
+select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json')::jsonb;
+#+end_src
