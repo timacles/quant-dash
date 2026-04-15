@@ -10,6 +10,8 @@ from wsgiref.simple_server import WSGIServer, make_server
 
 from dashboard.config import load_config
 from dashboard.routes import (
+    route_api_config_get,
+    route_api_config_update,
     route_api_latest_date,
     route_api_section,
     route_api_sections,
@@ -41,6 +43,13 @@ def app(environ: dict[str, Any], start_response: Any) -> Any:
 
     if path == "/config":
         return route_config_page(start_response)
+
+    if path == "/api/config/section":
+        query = parse_qs(environ.get("QUERY_STRING", ""))
+        method = environ.get("REQUEST_METHOD", "GET").upper()
+        if method == "POST":
+            return route_api_config_update(environ, start_response)
+        return route_api_config_get(query, start_response)
 
     if path == "/pull_stats/stream":
         query = parse_qs(environ.get("QUERY_STRING", ""))

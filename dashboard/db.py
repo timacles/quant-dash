@@ -267,6 +267,49 @@ def fetch_latest_report_date(conn: psycopg2.extensions.connection) -> Any:
         return row[0] if row else None
 
 
+def fetch_all_section_configs(
+    conn: psycopg2.extensions.connection,
+) -> list[dict[str, Any]]:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT section_key, columns, column_labels
+            FROM config.etf_dashboard_section_config
+            ORDER BY section_key
+            """
+        )
+        return [
+            {
+                "section_key": section_key,
+                "columns": list(columns or []),
+                "column_labels": _parse_json_object(column_labels),
+            }
+            for section_key, columns, column_labels in cur.fetchall()
+        ]
+
+
+def update_section_config(
+    conn: psycopg2.extensions.connection,
+    section_key: str,
+    columns: list[str],
+    column_labels: dict[str, str],
+) -> None:
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE config.etf_dashboard_section_config
+            SET columns = %s,
+                column_labels = %s::jsonb,
+                updated_at = now()
+            WHERE section_key = %s
+            """,
+            [columns, json.dumps(column_labels), section_key],
+        )
+        if cur.rowcount == 0:
+            raise ValueError(f"No section found with key: {section_key!r}")
+    conn.commit()
+
+
 def fetch_analysis_row(
     conn: psycopg2.extensions.connection,
     report_date: str | None,

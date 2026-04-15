@@ -8,126 +8,13 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .config import resolve_database_config
-from .sections import (
-    DECIMAL_2_COLUMNS,
-    DECIMAL_3_COLUMNS,
-    PERCENT_COLUMNS,
-    SIGNED_COLUMNS,
-    ResolvedSectionConfig,
-)
+from .sections import ResolvedSectionConfig
 
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 def escape(value: Any) -> str:
     return html.escape("" if value is None else str(value))
-
-
-def sort_value(column: str, value: Any) -> str:
-    if value is None:
-        return ""
-    if column in PERCENT_COLUMNS:
-        return f"{float(value) * 100.0:.8f}"
-    if isinstance(value, (int, float)):
-        return f"{float(value):.8f}"
-    return str(value)
-
-
-def format_value(column: str, value: Any) -> str:
-    if value is None:
-        return "—"
-    if column == "rank":
-        return str(value)
-    if column in PERCENT_COLUMNS:
-        return f"{float(value) * 100.0:+.2f}%"
-    if column in DECIMAL_2_COLUMNS:
-        return f"{float(value):.2f}"
-    if column in DECIMAL_3_COLUMNS:
-        return f"{float(value):.3f}"
-    return str(value)
-
-
-def value_class(column: str, value: Any) -> str:
-    if value is None or column not in SIGNED_COLUMNS.union(PERCENT_COLUMNS):
-        return ""
-    number = float(value)
-    if number > 0:
-        return " etf-report__value--pos"
-    if number < 0:
-        return " etf-report__value--neg"
-    return ""
-
-
-def render_cell(column: str, row: dict[str, Any]) -> str:
-    if column == "symbol":
-        return (
-            f"<td data-sort-value='{escape(sort_value(column, row['symbol']))}'><span class='etf-report__symbol'>{escape(row['symbol'])}</span>"
-            f"<span class='etf-report__name'>{escape(row.get('asset_class', ''))}</span></td>"
-        )
-    if column == "display_name":
-        return f"<td data-sort-value='{escape(sort_value(column, row[column]))}'>{escape(row[column])}</td>"
-    classes = "etf-report__value" + value_class(column, row.get(column))
-    return (
-        f"<td class='{classes.strip()}' data-sort-value='{escape(sort_value(column, row.get(column)))}'>"
-        f"{escape(format_value(column, row.get(column)))}</td>"
-    )
-
-
-def render_table_section(section: ResolvedSectionConfig, rows: list[dict[str, Any]]) -> str:
-    if not rows:
-        return (
-            "<div class='etf-report__card'>"
-            f"<div class='etf-report__card-head'><h2 class='etf-report__card-title'>{escape(section.title)}</h2>"
-            f"<p class='etf-report__card-desc'>{escape(section.description)}</p></div>"
-            "<div class='etf-report__empty'>No qualifying rows for the selected date.</div>"
-            "</div>"
-        )
-
-    as_of_date = rows[0]["date"]
-    market_regime = rows[0].get("market_regime")
-    header_html = "".join(
-        f"<th data-sort-index='{idx}' data-sort-direction=''>{escape(section.column_labels.get(col, col))}<span class='etf-report__sort-indicator'></span></th>"
-        for idx, col in enumerate(section.columns)
-    )
-    body_rows = []
-    for row in rows:
-        cell_html = "".join(render_cell(col, row) for col in section.columns)
-        body_rows.append(f"<tr>{cell_html}</tr>")
-
-    badges = [
-        f"<span class='etf-report__badge'>As of {escape(as_of_date)}</span>",
-        f"<span class='etf-report__badge'>{len(rows)} rows</span>",
-    ]
-    if market_regime:
-        badges.insert(1, f"<span class='etf-report__badge'>Market Regime: {escape(market_regime)}</span>")
-
-    return f"""
-    <div class="etf-report__card">
-      <div class="etf-report__card-head">
-        <h2 class="etf-report__card-title">{escape(section.title)}</h2>
-        <p class="etf-report__card-desc">{escape(section.description)}</p>
-        <div class="etf-report__card-meta">{''.join(badges)}</div>
-      </div>
-      <div class="etf-report__table-wrap">
-        <table class="etf-report__table">
-          <thead><tr>{header_html}</tr></thead>
-          <tbody>{''.join(body_rows)}</tbody>
-        </table>
-      </div>
-    </div>
-    """
-
-
-def render_section(section: ResolvedSectionConfig, data: list[dict[str, Any]]) -> str:
-    if section.type == "table":
-        return render_table_section(section, data)
-    return (
-        "<div class='etf-report__card'>"
-        f"<div class='etf-report__card-head'><h2 class='etf-report__card-title'>{escape(section.title)}</h2>"
-        f"<p class='etf-report__card-desc'>{escape(section.description)}</p></div>"
-        "<div class='etf-report__empty'>Section type not implemented yet.</div>"
-        "</div>"
-    )
 
 
 def render_fragment(

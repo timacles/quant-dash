@@ -14,6 +14,7 @@ import psycopg2
 
 from .config import PULL_STATS_PATH, BASE_DIR, load_config, build_connection_kwargs
 from .db import (
+    fetch_all_section_configs,
     fetch_analysis_row,
     fetch_latest_report_date,
     fetch_macro_summary,
@@ -23,6 +24,7 @@ from .db import (
     parse_limit,
     resolve_sections,
     serialize_date,
+    update_section_config,
 )
 from .render import build_page
 from .sections import SECTIONS
@@ -152,6 +154,56 @@ def route_api_section(query: dict[str, list[str]], start_response: Any) -> list[
         }
         start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
         return [json.dumps(payload).encode("utf-8")]
+    except Exception as exc:
+        return json_error(start_response, "500 Internal Server Error", str(exc))
+
+
+def route_api_config_get(query: dict[str, list[str]], start_response: Any) -> list[bytes]:
+    try:
+        config = load_config()
+        connect_kwargs = build_connection_kwargs(config)
+        section_key = query.get("key", [None])[0]
+        with psycopg2.connect(**connect_kwargs) as conn:
+            all_configs = fetch_all_section_configs(conn)
+        if section_key:
+            match = next((s for s in all_configs if s["section_key"] == section_key), None)
+            if match is None:
+                return json_error(start_response, "404 Not Found", f"Unknown section: {section_key!r}")
+            payload = match
+        else:
+            payload = {"sections": all_configs}
+        start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
+        return [json.dumps(payload).encode("utf-8")]
+    except Exception as exc:
+        return json_error(start_response, "500 Internal Server Error", str(exc))
+
+
+def route_api_config_update(environ: dict[str, Any], start_response: Any) -> list[bytes]:
+    try:
+        content_length = int(environ.get("CONTENT_LENGTH") or 0)
+        body = environ["wsgi.input"].read(content_length)
+        data = json.loads(body)
+
+        section_key = data.get("section_key", "")
+        columns: list[str] = data.get("columns", [])
+        column_labels: dict[str, str] = data.get("column_labels", {})
+
+        if not section_key:
+            return json_error(start_response, "400 Bad Request", "section_key is required")
+        if not columns:
+            return json_error(start_response, "400 Bad Request", "columns must be a non-empty list")
+        if set(column_labels.keys()) != set(columns):
+            return json_error(start_response, "400 Bad Request", "column_labels keys must exactly match columns")
+
+        config = load_config()
+        connect_kwargs = build_connection_kwargs(config)
+        with psycopg2.connect(**connect_kwargs) as conn:
+            update_section_config(conn, section_key, columns, column_labels)
+
+        start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
+        return [json.dumps({"ok": True}).encode("utf-8")]
+    except ValueError as exc:
+        return json_error(start_response, "400 Bad Request", str(exc))
     except Exception as exc:
         return json_error(start_response, "500 Internal Server Error", str(exc))
 

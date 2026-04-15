@@ -69,7 +69,9 @@ function valueClass(column, value) {
 
 function renderCell(column, row) {
   if (column === "symbol") {
-    return `<td data-sort-value="${escapeHtml(sortValue(column, row.symbol))}"><span class="etf-report__symbol">${escapeHtml(row.symbol ?? "")}</span><span class="etf-report__name">${escapeHtml(row.asset_class ?? "")}</span></td>`;
+    const sym = row.symbol ?? "";
+    const finvizUrl = `https://finviz.com/quote.ashx?t=${encodeURIComponent(sym)}`;
+    return `<td data-sort-value="${escapeHtml(sortValue(column, sym))}"><a class="etf-report__symbol-link" href="${finvizUrl}" target="_blank" rel="noopener noreferrer"><span class="etf-report__symbol">${escapeHtml(sym)}</span></a><span class="etf-report__name">${escapeHtml(row.asset_class ?? "")}</span></td>`;
   }
   if (column === "display_name") {
     return `<td data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(row[column] ?? "")}</td>`;

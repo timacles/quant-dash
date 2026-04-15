@@ -1,24 +1,27 @@
-#+TITLE: Quant Dash TODOs
+#+TITLE: Quant Dash 
 
 * Main 
-** [#A] Theme View Card
-   - [ ] leader/laggards
-   - [ ] theme/industry/sector
-*** theme SQL view 
-** Config endpoint
-** Range of numbers coloring
-or top 3 get highlighted
-** Display ETF discrepancies in endpoint
-** Link symbol to finviz chart
-** Macro Stats Card
+** [#A] Macro Stats Card
    - DXY, VIX
+     - where do I pull this from?
    - breadth: pct above 20SMA
 *** bond ETFs view simpler
 - basic VOL, ret
 - remove bucket
+** Theme View Card
+   - [ ] leader/laggards
+   - [ ] theme/industry/sector
+*** theme SQL view 
+** ETF discrepancies endpoint
 ** add graph visualizations
 ** Fix broken repo main branch
-** [#A] Deployer [0/4]
+** pull_stats/ displays last pulled
+** [#B] Other
+*** display current time
+*** Range of numbers coloring
+or top 3 get highlighted
+*** ETF metadata editor
+*** [#A] Deployer [0/4]
 - [ ] deploy only necessary code, not whole repo. Only main latest.
 - [ ] improve error handling
 - [ ] develop _spec_
