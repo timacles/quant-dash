@@ -8,6 +8,7 @@
 *** bond ETFs view simpler
 - basic VOL, ret
 - remove bucket
+*** FRED API
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
