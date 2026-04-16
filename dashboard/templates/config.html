@@ -63,13 +63,13 @@
     select:focus { outline: none; border-color: var(--accent); }
     .section-editor { display: none; margin-top: 28px; }
     .section-editor.visible { display: block; }
-    .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    @media (max-width: 600px) { .editor-grid { grid-template-columns: 1fr; } }
+    .editor-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    @media (max-width: 800px) { .editor-grid { grid-template-columns: 1fr; } }
     .panel-title {
       font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--muted); margin: 0 0 10px;
     }
-    /* Columns list */
+    /* Active columns list */
     .col-list { list-style: none; margin: 0; padding: 0; }
     .col-item {
       display: flex;
@@ -89,6 +89,33 @@
     .col-item.drag-over { border-color: var(--accent); background: var(--accent-dim); }
     .col-item.dragging { opacity: 0.4; }
     .drag-handle { color: var(--muted); flex-shrink: 0; font-size: 16px; }
+    .col-name { flex: 1; }
+    .col-remove {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 16px; line-height: 1; padding: 0 2px; flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .col-remove:hover { color: var(--danger); }
+    /* Available columns list */
+    .avail-list { list-style: none; margin: 0; padding: 0; }
+    .avail-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+      background: var(--input-bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .avail-item:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .avail-add { color: var(--accent); font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .avail-empty { color: var(--muted); font-size: 12px; font-style: italic; }
     /* Labels table */
     .labels-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .labels-table th {
@@ -149,8 +176,12 @@
     <div class="section-editor" id="section-editor">
       <div class="editor-grid">
         <div>
-          <div class="panel-title">Column Order <span style="color:var(--accent);font-size:10px;letter-spacing:0">(drag to reorder)</span></div>
+          <div class="panel-title">Active Columns <span style="color:var(--accent);font-size:10px;letter-spacing:0">(drag to reorder)</span></div>
           <ul class="col-list" id="col-list"></ul>
+        </div>
+        <div>
+          <div class="panel-title">Available Columns <span style="color:var(--accent);font-size:10px;letter-spacing:0">(click to add)</span></div>
+          <ul class="avail-list" id="avail-list"></ul>
         </div>
         <div>
           <div class="panel-title">Column Labels</div>
@@ -168,16 +199,18 @@
   </div>
 
   <script>
-    const selectEl  = document.getElementById('section-select');
-    const editorEl  = document.getElementById('section-editor');
-    const colList   = document.getElementById('col-list');
+    const selectEl   = document.getElementById('section-select');
+    const editorEl   = document.getElementById('section-editor');
+    const colList    = document.getElementById('col-list');
+    const availList  = document.getElementById('avail-list');
     const labelsBody = document.getElementById('labels-body');
-    const btnSave   = document.getElementById('btn-save');
-    const toast     = document.getElementById('toast');
-    const loadingEl = document.getElementById('loading');
+    const btnSave    = document.getElementById('btn-save');
+    const toast      = document.getElementById('toast');
+    const loadingEl  = document.getElementById('loading');
 
     let currentSectionKey = '';
     let allSections = [];
+    let allViewColumns = [];   // ordered list from view
 
     // ── load all section keys on boot ──────────────────────────────────────
     async function loadSections() {
@@ -192,25 +225,96 @@
       }
     }
 
-    // ── render editor for selected section ────────────────────────────────
-    function renderEditor(sectionData) {
-      currentSectionKey = sectionData.section_key;
-      renderColList(sectionData.columns);
-      renderLabels(sectionData.columns, sectionData.column_labels);
+    // ── render editor ─────────────────────────────────────────────────────
+    function renderEditor(data) {
+      currentSectionKey = data.section_key;
+      allViewColumns = data.all_columns || [];
+      renderColList(data.active_columns);
+      renderAvailList(data.active_columns);
+      renderLabels(data.active_columns, data.column_labels);
       editorEl.classList.add('visible');
     }
 
     function renderColList(columns) {
       colList.innerHTML = '';
       for (const col of columns) {
-        const li = document.createElement('li');
-        li.className = 'col-item';
-        li.draggable = true;
-        li.dataset.col = col;
-        li.innerHTML = `<span class="drag-handle">⠿</span><span>${col}</span>`;
-        attachDragListeners(li);
-        colList.appendChild(li);
+        colList.appendChild(makeActiveItem(col));
       }
+    }
+
+    function makeActiveItem(col) {
+      const li = document.createElement('li');
+      li.className = 'col-item';
+      li.draggable = true;
+      li.dataset.col = col;
+      li.innerHTML = `<span class="drag-handle">⠿</span><span class="col-name">${col}</span><button class="col-remove" title="Remove column" type="button">×</button>`;
+      li.querySelector('.col-remove').addEventListener('click', () => removeColumn(col));
+      attachDragListeners(li);
+      return li;
+    }
+
+    function renderAvailList(activeColumns) {
+      const activeSet = new Set(activeColumns);
+      const available = allViewColumns.filter(c => !activeSet.has(c));
+      availList.innerHTML = '';
+      if (!available.length) {
+        const li = document.createElement('li');
+        li.className = 'avail-empty';
+        li.textContent = 'All columns are active.';
+        availList.appendChild(li);
+        return;
+      }
+      for (const col of available) {
+        availList.appendChild(makeAvailItem(col));
+      }
+    }
+
+    function makeAvailItem(col) {
+      const li = document.createElement('li');
+      li.className = 'avail-item';
+      li.dataset.col = col;
+      li.innerHTML = `<span>${col}</span><span class="avail-add">+</span>`;
+      li.addEventListener('click', () => addColumn(col));
+      return li;
+    }
+
+    function addColumn(col) {
+      const currentLabels = getCurrentLabels();
+      colList.appendChild(makeActiveItem(col));
+      // auto-generate label: title-case, replace underscores with spaces
+      if (!currentLabels[col]) {
+        currentLabels[col] = col.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      }
+      // remove from avail list
+      const availItem = availList.querySelector(`.avail-item[data-col="${CSS.escape(col)}"]`);
+      if (availItem) availItem.remove();
+      if (!availList.querySelector('.avail-item')) {
+        const li = document.createElement('li');
+        li.className = 'avail-empty';
+        li.textContent = 'All columns are active.';
+        availList.appendChild(li);
+      }
+      renderLabels(getCurrentColumns(), currentLabels);
+    }
+
+    function removeColumn(col) {
+      const activeItem = colList.querySelector(`.col-item[data-col="${CSS.escape(col)}"]`);
+      if (activeItem) activeItem.remove();
+      // add back to avail list in original view order
+      availList.querySelector('.avail-empty')?.remove();
+      const currentActive = new Set(getCurrentColumns());
+      // rebuild avail list in view order to keep it sorted
+      const newAvail = allViewColumns.filter(c => !currentActive.has(c));
+      availList.innerHTML = '';
+      if (!newAvail.length) {
+        const li = document.createElement('li');
+        li.className = 'avail-empty';
+        li.textContent = 'All columns are active.';
+        availList.appendChild(li);
+      } else {
+        for (const c of newAvail) availList.appendChild(makeAvailItem(c));
+      }
+      renderLabels(getCurrentColumns(), getCurrentLabels());
     }
 
     function renderLabels(columns, labels) {
@@ -262,7 +366,6 @@
       });
     }
 
-    // After reorder, re-render labels in new order preserving existing input values
     function syncLabelsToColumns() {
       const currentLabels = getCurrentLabels();
       const newOrder = getCurrentColumns();
@@ -288,7 +391,7 @@
       loadingEl.style.display = 'block';
       editorEl.classList.remove('visible');
       try {
-        const res = await fetch(`/api/config/section?key=${encodeURIComponent(key)}`);
+        const res = await fetch(`/api/config/section/columns?key=${encodeURIComponent(key)}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to load section');
         renderEditor(data);
@@ -305,9 +408,12 @@
       const columns = getCurrentColumns();
       const column_labels = getCurrentLabels();
 
-      // client-side validation
-      const labelKeys = Object.keys(column_labels);
-      const missing = columns.filter(c => !labelKeys.includes(c));
+      if (!columns.length) {
+        showToast('At least one column is required', 'err');
+        btnSave.disabled = false;
+        return;
+      }
+      const missing = columns.filter(c => !column_labels[c]?.trim());
       if (missing.length) {
         showToast(`Missing labels for: ${missing.join(', ')}`, 'err');
         btnSave.disabled = false;

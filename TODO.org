@@ -15,10 +15,10 @@
 *** theme SQL view 
 ** ETF discrepancies endpoint
 ** add graph visualizations
-** Fix broken repo main branch
+** speed up DB views
+- mat views?
 ** pull_stats/ displays last pulled
 ** [#B] Other
-*** display current time
 *** Range of numbers coloring
 or top 3 get highlighted
 *** ETF metadata editor

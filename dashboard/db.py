@@ -310,6 +310,49 @@ def update_section_config(
     conn.commit()
 
 
+def fetch_section_all_columns(
+    conn: psycopg2.extensions.connection,
+    section_key: str,
+) -> dict[str, Any]:
+    section = next((s for s in SECTIONS if s.key == section_key), None)
+    if section is None:
+        raise ValueError(f"Unknown section: {section_key!r}")
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = %s
+            ORDER BY ordinal_position
+            """,
+            [section.source],
+        )
+        all_columns = [row[0] for row in cur.fetchall()]
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT columns, column_labels
+            FROM config.etf_dashboard_section_config
+            WHERE section_key = %s
+            """,
+            [section_key],
+        )
+        row = cur.fetchone()
+
+    if row is None:
+        raise ValueError(f"No config found for section: {section_key!r}")
+
+    return {
+        "section_key": section_key,
+        "all_columns": all_columns,
+        "active_columns": list(row[0] or []),
+        "column_labels": _parse_json_object(row[1]),
+    }
+
+
 def fetch_analysis_row(
     conn: psycopg2.extensions.connection,
     report_date: str | None,

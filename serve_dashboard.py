@@ -11,6 +11,7 @@ from wsgiref.simple_server import WSGIServer, make_server
 from dashboard.config import load_config
 from dashboard.routes import (
     route_api_config_get,
+    route_api_config_section_columns,
     route_api_config_update,
     route_api_latest_date,
     route_api_section,
@@ -43,6 +44,10 @@ def app(environ: dict[str, Any], start_response: Any) -> Any:
 
     if path == "/config":
         return route_config_page(start_response)
+
+    if path == "/api/config/section/columns":
+        query = parse_qs(environ.get("QUERY_STRING", ""))
+        return route_api_config_section_columns(query, start_response)
 
     if path == "/api/config/section":
         query = parse_qs(environ.get("QUERY_STRING", ""))

@@ -18,6 +18,7 @@ from .db import (
     fetch_analysis_row,
     fetch_latest_report_date,
     fetch_macro_summary,
+    fetch_section_all_columns,
     fetch_section_display_configs,
     fetch_section_rows,
     get_section,
@@ -204,6 +205,23 @@ def route_api_config_update(environ: dict[str, Any], start_response: Any) -> lis
         return [json.dumps({"ok": True}).encode("utf-8")]
     except ValueError as exc:
         return json_error(start_response, "400 Bad Request", str(exc))
+    except Exception as exc:
+        return json_error(start_response, "500 Internal Server Error", str(exc))
+
+
+def route_api_config_section_columns(query: dict[str, list[str]], start_response: Any) -> list[bytes]:
+    try:
+        section_key = query.get("key", [None])[0]
+        if not section_key:
+            return json_error(start_response, "400 Bad Request", "key is required")
+        config = load_config()
+        connect_kwargs = build_connection_kwargs(config)
+        with psycopg2.connect(**connect_kwargs) as conn:
+            payload = fetch_section_all_columns(conn, section_key)
+        start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
+        return [json.dumps(payload).encode("utf-8")]
+    except ValueError as exc:
+        return json_error(start_response, "404 Not Found", str(exc))
     except Exception as exc:
         return json_error(start_response, "500 Internal Server Error", str(exc))
 
