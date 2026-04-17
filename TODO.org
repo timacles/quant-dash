@@ -2,32 +2,25 @@
 
 * Main 
 ** [#A] Macro Stats Card
-- DXY, VIX
-- breadth: pct above 20SMA
-- basic VOL, ret
+ - DXY, VIX
+   - breadth: pct above 20SMA
 *** bond ETFs view simpler
- - where do I pull this from?
-*** [#A] FRED API
+- basic VOL, ret
+*** FRED API
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
 ** ETF discrepancies endpoint
-** add graph visualizations
-** TODO [#A] speed up DB views
-- mat views?
 ** =pull_stats/= endpoint
 - displays last pulled
 ** Other
-*** Range of numbers coloring
-or top 3 get highlighted
-*** ETF metadata editor
 * Later
 ** industry leader stocks
 - scrape from finviz
 - by volume descending
 
-** export to json -> llm 
+** JSON export to LLM analysis
    - import json -> DB from llm analysis
    - =vw_llm_market_analysis=
    #+begin_src sql
@@ -41,6 +34,7 @@ insert into etf_analysis (data)
 select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json')::jsonb;
 #+end_src
 
-
-** LLM Sessions
-- =codex resume 019d8d45-16be-7410-a683-259193cf976e=
+** add graph visualizations
+** Range of numbers coloring
+or top 3 get highlighted
+** ETF metadata editor
