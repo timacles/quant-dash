@@ -2,32 +2,26 @@
 
 * Main 
 ** [#A] Macro Stats Card
-   - DXY, VIX
-     - where do I pull this from?
-   - breadth: pct above 20SMA
-*** bond ETFs view simpler
+- DXY, VIX
+- breadth: pct above 20SMA
 - basic VOL, ret
-- remove bucket
-*** FRED API
+*** bond ETFs view simpler
+ - where do I pull this from?
+*** [#A] FRED API
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
 ** ETF discrepancies endpoint
 ** add graph visualizations
-** speed up DB views
+** TODO [#A] speed up DB views
 - mat views?
-** pull_stats/ displays last pulled
-** [#B] Other
+** =pull_stats/= endpoint
+- displays last pulled
+** Other
 *** Range of numbers coloring
 or top 3 get highlighted
 *** ETF metadata editor
-*** [#A] Deployer [0/4]
-- [ ] deploy only necessary code, not whole repo. Only main latest.
-- [ ] improve error handling
-- [ ] develop _spec_
-- [ ] dir that only does
-  =git pull origin main=
 * Later
 ** industry leader stocks
 - scrape from finviz

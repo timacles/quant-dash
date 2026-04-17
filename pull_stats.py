@@ -343,6 +343,12 @@ def main():
         df_results = pd.DataFrame(results)
         logging.info("Completed processing all symbols")
         print(df_results.sort_values("5D Return %", ascending=False))
+
+        logging.info("Refreshing materialized views")
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT refresh_etf_matviews()")
+        conn.commit()
+        logging.info("Materialized views refreshed")
     finally:
         logging.info("Closing database connection")
         conn.close()
