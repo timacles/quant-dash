@@ -80,11 +80,16 @@ def fetch_section_display_configs(
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT table_name, column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = ANY(%s)
-            ORDER BY table_name, ordinal_position
+            SELECT c.relname AS table_name,
+                   a.attname AS column_name
+            FROM pg_attribute a
+            JOIN pg_class c ON c.oid = a.attrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public'
+              AND c.relname = ANY(%s)
+              AND a.attnum > 0
+              AND NOT a.attisdropped
+            ORDER BY c.relname, a.attnum
             """,
             [view_names],
         )
@@ -156,11 +161,11 @@ def fetch_macro_summary(
     report_date: str | None,
 ) -> dict[str, Any]:
     try:
-        date_sql = sql.SQL("%s") if report_date else sql.SQL("(SELECT max(date) FROM public.vw_macro_signal_dashboard)")
+        date_sql = sql.SQL("%s") if report_date else sql.SQL("(SELECT max(date) FROM public.mv_macro_signal_dashboard)")
         query = sql.SQL(
             """
             SELECT *
-            FROM public.vw_macro_signal_dashboard
+            FROM public.mv_macro_signal_dashboard
             WHERE date = {date_sql}
             LIMIT 1
             """
@@ -183,7 +188,7 @@ def fetch_macro_summary(
                 cur.execute(
                     """
                     SELECT rank, symbol, display_name, bond_bucket, composite_score, date
-                    FROM public.vw_etf_report_bond_credit_performance
+                    FROM public.mv_etf_report_bond_credit_performance
                     WHERE date = %s
                     ORDER BY rank
                     LIMIT 3
@@ -321,11 +326,15 @@ def fetch_section_all_columns(
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = %s
-            ORDER BY ordinal_position
+            SELECT a.attname AS column_name
+            FROM pg_attribute a
+            JOIN pg_class c ON c.oid = a.attrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public'
+              AND c.relname = %s
+              AND a.attnum > 0
+              AND NOT a.attisdropped
+            ORDER BY a.attnum
             """,
             [section.source],
         )

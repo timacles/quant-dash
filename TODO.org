@@ -2,35 +2,21 @@
 
 * Main 
 ** [#A] Macro Stats Card
-   - DXY, VIX
-     - where do I pull this from?
-   - breadth: pct above 20SMA
-*** bond ETFs view simpler
+- DXY, VIX
+- breadth: pct above 20SMA
 - basic VOL, ret
-- remove bucket
-*** FRED API
+*** bond ETFs view simpler
+ - where do I pull this from?
+*** [#A] FRED API
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
-** ETF discrepancies endpoint
-** add graph visualizations
-** Fix broken repo main branch
-** pull_stats
--  displays last pulled date
-** [#B] Other
-*** display current time in =eyebrow=
-*** add option to load prod/dev
-*** Range of numbers coloring
-or top 3 get highlighted
-*** ETF metadata editor
-*** [#A] Deployer [0/4]
-- [ ] deploy only necessary code, not whole repo. Only main latest.
-- [ ] improve error handling
-- [ ] develop _spec_
-- [ ] dir that only does
-  =git pull origin main=
 * Later
+** ETF discrepancies endpoint
+** Range of numbers coloring
+or top 3 get highlighted
+** ETF metadata editor
 ** industry leader stocks
 - scrape from finviz
 - by volume descending
@@ -49,6 +35,12 @@ insert into etf_analysis (data)
 select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json')::jsonb;
 #+end_src
 
-
 ** LLM Sessions
 - =codex resume 019d8d45-16be-7410-a683-259193cf976e=
+
+** add graph visualizations
+** pull_stats
+-  displays last pulled date
+** add option to load prod/dev
+** =pull_stats/= endpoint
+- displays last pulled
