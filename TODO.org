@@ -1,36 +1,18 @@
 #+TITLE: Quant Dash 
 
 * Main 
-** [#A] Macro Stats Card
- - DXY, VIX
-   - breadth: pct above 20SMA
-*** bond ETFs view simpler
-- basic VOL, ret
 ** Spec Strategy
 - keep changes scope
 - each implementation path should have its own instructions/plan file
-** FRED API -- ??
-still needed, VIXY & VIXM & UUP as proxies
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
-** ETF discrepancies endpoint
-** add graph visualizations
-** TODO [#A] speed up DB views
-- mat views?
-** =pull_stats/= endpoint
-- displays last pulled
-** Other
-*** Range of numbers coloring
-or top 3 get highlighted
-*** ETF metadata editor
 * Later
 ** industry leader stocks
 - scrape from finviz
 - by volume descending
 
-** ETF discrepancies endpoint
 ** =pull_stats/= endpoint
 - displays last pulled
 ** JSON export to LLM analysis
@@ -51,3 +33,4 @@ select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json
 ** Range of numbers coloring
 or top 3 get highlighted
 ** ETF metadata editor
+** FRED API ?
