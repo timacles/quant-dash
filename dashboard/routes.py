@@ -61,7 +61,7 @@ def route_static_file(path: str, start_response: Any) -> list[bytes]:
         start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
         return [b"Not found"]
     mime = _STATIC_MIME.get(file_path.suffix, "application/octet-stream")
-    start_response("200 OK", [("Content-Type", mime), ("Cache-Control", "public, max-age=3600")])
+    start_response("200 OK", [("Content-Type", mime), ("Cache-Control", "no-cache")])
     return [file_path.read_bytes()]
 
 
