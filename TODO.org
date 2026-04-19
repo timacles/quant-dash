@@ -2,7 +2,6 @@
 
 * Main 
 ** [#A] Macro Stats Card
-
  - DXY, VIX
    - breadth: pct above 20SMA
 *** bond ETFs view simpler
