@@ -8,6 +8,9 @@
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
+** Split Sections Out 
+- add a section loader or just move them to separate pages
+- move the Macro section to the bottom;
 * Later
 ** industry leader stocks
 - scrape from finviz
