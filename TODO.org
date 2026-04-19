@@ -2,6 +2,11 @@
 
 * Main 
 ** [#A] Macro Stats Card
+ - DXY, VIX
+   - breadth: pct above 20SMA
+*** bond ETFs view simpler
+- basic VOL, ret
+*** FRED API
 - DXY, VIX
 - breadth: pct above 20SMA
 - basic VOL, ret
@@ -27,7 +32,10 @@ or top 3 get highlighted
 - scrape from finviz
 - by volume descending
 
-** export to json -> llm 
+** ETF discrepancies endpoint
+** =pull_stats/= endpoint
+- displays last pulled
+** JSON export to LLM analysis
    - import json -> DB from llm analysis
    - =vw_llm_market_analysis=
    #+begin_src sql
@@ -41,6 +49,7 @@ insert into etf_analysis (data)
 select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json')::jsonb;
 #+end_src
 
-
-** LLM Sessions
-- =codex resume 019d8d45-16be-7410-a683-259193cf976e=
+** add graph visualizations
+** Range of numbers coloring
+or top 3 get highlighted
+** ETF metadata editor
