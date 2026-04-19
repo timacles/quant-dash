@@ -212,10 +212,11 @@ def fetch_macro_summary(
             "date": summary_date,
             "rows": rows,
         }
-    except Exception:
+    except Exception as exc:
         return {
             "date": serialize_date(report_date),
             "rows": [],
+            "error": str(exc),
         }
 
 

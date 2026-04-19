@@ -270,7 +270,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Pull ETF stats and store OHLCV data.")
     parser.add_argument(
         "--symbol",
-        help="Single ETF symbol to process (overrides config list).",
+        nargs="+",
+        help="One or more ETF symbols to process (overrides config list).",
     )
     parser.add_argument(
         "--days-back",
@@ -291,6 +292,11 @@ def parse_args():
     parser.add_argument(
         "--db-target",
         help="Database target name from config.toml, such as dev or prod.",
+    )
+    parser.add_argument(
+        "--skip-refresh",
+        action="store_true",
+        help="Skip calling refresh_etf_matviews() after processing symbols.",
     )
     return parser.parse_args()
 
@@ -315,8 +321,11 @@ def main():
     api_key = load_api_key(config)
 
     if args.desc:
-        payload = fetch_description(args.symbol, api_key) 
-        print(payload)
+        if not args.symbol:
+            raise RuntimeError("--desc requires at least one --symbol value.")
+        for symbol in args.symbol:
+            payload = fetch_description(symbol.upper(), api_key)
+            print(payload)
         sys.exit(0)
 
 
@@ -327,8 +336,8 @@ def main():
         ensure_etf_universe_table(conn)
 
         if args.symbol:
-            symbols = [args.symbol.upper()]
-            logging.info("Using CLI symbol override: %s", symbols[0])
+            symbols = [symbol.upper() for symbol in args.symbol]
+            logging.info("Using CLI symbol override: %s", ", ".join(symbols))
         else:
             symbols = get_target_etfs(conn)
             if not symbols:
@@ -344,11 +353,14 @@ def main():
         logging.info("Completed processing all symbols")
         print(df_results.sort_values("5D Return %", ascending=False))
 
-        logging.info("Refreshing materialized views")
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT refresh_etf_matviews()")
-        conn.commit()
-        logging.info("Materialized views refreshed")
+        if args.skip_refresh:
+            logging.info("Skipping materialized view refresh due to --skip-refresh")
+        else:
+            logging.info("Refreshing materialized views")
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT refresh_etf_matviews()")
+            conn.commit()
+            logging.info("Materialized views refreshed")
     finally:
         logging.info("Closing database connection")
         conn.close()

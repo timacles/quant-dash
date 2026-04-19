@@ -271,6 +271,26 @@ WITH ratio_pairs AS (
     SELECT 'XLE/SPY', 'XLE', 'SPY', 'energy_inflation', 'Energy leadership vs broad market'
     UNION ALL
     SELECT 'TLT/IEF', 'TLT', 'IEF', 'duration_curve', 'Long duration vs intermediate treasury'
+    UNION ALL
+    SELECT 'VIXY/VIXM', 'VIXY', 'VIXM', 'vol_term_structure', 'VIX short-term vs mid-term futures'
+    UNION ALL
+    SELECT 'TLT/SHY', 'TLT', 'SHY', 'yield_curve', 'Long vs short treasury (yield curve proxy)'
+    UNION ALL
+    SELECT 'QQQ/IWD', 'QQQ', 'IWD', 'growth_vs_value', 'Growth vs value rotation'
+    UNION ALL
+    SELECT 'XLY/XLP', 'XLY', 'XLP', 'cyclical_vs_defensive', 'Cyclicals vs defensives (consumer strength)'
+    UNION ALL
+    SELECT 'SPY/TLT', 'SPY', 'TLT', 'equity_vs_bond', 'Equities vs bonds (risk appetite)'
+    UNION ALL
+    SELECT 'CPER/GLD', 'CPER', 'GLD', 'copper_vs_gold', 'Copper vs gold (reflation gauge)'
+    UNION ALL
+    SELECT 'EEM/EFA', 'EEM', 'EFA', 'em_vs_dm', 'Emerging vs developed markets'
+    UNION ALL
+    SELECT 'RSP/SPY', 'RSP', 'SPY', 'equal_vs_cap_weight', 'Equal-weight vs cap-weight breadth'
+    UNION ALL
+    SELECT 'SPHB/SPLV', 'SPHB', 'SPLV', 'high_beta_vs_low_vol', 'High beta vs low volatility'
+    UNION ALL
+    SELECT 'XLI/XLU', 'XLI', 'XLU', 'industrial_vs_utility', 'Industrials vs utilities (ISM proxy)'
 ),
 joined AS (
     SELECT
@@ -285,9 +305,13 @@ joined AS (
         n.close AS numerator_close,
         d.close AS denominator_close,
         n.ret_5d AS numerator_ret_5d,
+        n.ret_10d AS numerator_ret_10d,
         n.ret_20d AS numerator_ret_20d,
         d.ret_5d AS denominator_ret_5d,
-        d.ret_20d AS denominator_ret_20d
+        d.ret_10d AS denominator_ret_10d,
+        d.ret_20d AS denominator_ret_20d,
+        n.volume_ratio_5_20 AS numerator_volume_ratio_5_20,
+        d.volume_ratio_5_20 AS denominator_volume_ratio_5_20
     FROM ratio_pairs rp
     JOIN public.vw_etf_daily_features n
         ON n.symbol = rp.numerator_symbol
@@ -303,6 +327,7 @@ base AS (
             ELSE j.numerator_close / j.denominator_close
         END AS ratio_close,
         j.numerator_ret_5d - j.denominator_ret_5d AS spread_ret_5d,
+        j.numerator_ret_10d - j.denominator_ret_10d AS spread_ret_10d,
         j.numerator_ret_20d - j.denominator_ret_20d AS spread_ret_20d
     FROM joined j
 ),
@@ -311,17 +336,20 @@ enriched AS (
         b.*,
         lag(b.ratio_close) OVER w AS ratio_close_1d_ago,
         lag(b.ratio_close, 5) OVER w AS ratio_close_5d_ago,
+        lag(b.ratio_close, 10) OVER w AS ratio_close_10d_ago,
         lag(b.ratio_close, 20) OVER w AS ratio_close_20d_ago,
         lag(b.ratio_close, 60) OVER w AS ratio_close_60d_ago,
         avg(b.ratio_close) OVER w20 AS ratio_sma_20,
         avg(b.ratio_close) OVER w50 AS ratio_sma_50,
+        avg(b.ratio_close) OVER w200 AS ratio_sma_200,
         avg(b.spread_ret_5d) OVER w20 AS spread_ret_5d_smooth_20,
         avg(b.spread_ret_20d) OVER w20 AS spread_ret_20d_smooth_20
     FROM base b
     WINDOW
         w AS (PARTITION BY b.ratio_name ORDER BY b.date),
         w20 AS (PARTITION BY b.ratio_name ORDER BY b.date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW),
-        w50 AS (PARTITION BY b.ratio_name ORDER BY b.date ROWS BETWEEN 49 PRECEDING AND CURRENT ROW)
+        w50 AS (PARTITION BY b.ratio_name ORDER BY b.date ROWS BETWEEN 49 PRECEDING AND CURRENT ROW),
+        w200 AS (PARTITION BY b.ratio_name ORDER BY b.date ROWS BETWEEN 199 PRECEDING AND CURRENT ROW)
 )
 SELECT
     e.date,
@@ -342,6 +370,10 @@ SELECT
         ELSE e.ratio_close / e.ratio_close_5d_ago - 1
     END AS ratio_ret_5d,
     CASE
+        WHEN e.ratio_close_10d_ago IS NULL OR e.ratio_close_10d_ago = 0 THEN NULL
+        ELSE e.ratio_close / e.ratio_close_10d_ago - 1
+    END AS ratio_ret_10d,
+    CASE
         WHEN e.ratio_close_20d_ago IS NULL OR e.ratio_close_20d_ago = 0 THEN NULL
         ELSE e.ratio_close / e.ratio_close_20d_ago - 1
     END AS ratio_ret_20d,
@@ -350,11 +382,13 @@ SELECT
         ELSE e.ratio_close / e.ratio_close_60d_ago - 1
     END AS ratio_ret_60d,
     e.spread_ret_5d,
+    e.spread_ret_10d,
     e.spread_ret_20d,
     e.spread_ret_5d_smooth_20,
     e.spread_ret_20d_smooth_20,
     e.ratio_sma_20,
     e.ratio_sma_50,
+    e.ratio_sma_200,
     CASE
         WHEN e.ratio_sma_20 IS NULL OR e.ratio_sma_20 = 0 THEN NULL
         ELSE e.ratio_close / e.ratio_sma_20 - 1
@@ -363,6 +397,10 @@ SELECT
         WHEN e.ratio_sma_50 IS NULL OR e.ratio_sma_50 = 0 THEN NULL
         ELSE e.ratio_close / e.ratio_sma_50 - 1
     END AS ratio_vs_sma_50,
+    CASE
+        WHEN e.ratio_sma_200 IS NULL OR e.ratio_sma_200 = 0 THEN NULL
+        ELSE e.ratio_close / e.ratio_sma_200 - 1
+    END AS ratio_vs_sma_200,
     CASE
         WHEN e.ratio_close > e.ratio_sma_20
          AND e.spread_ret_20d_smooth_20 > 0

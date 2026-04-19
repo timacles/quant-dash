@@ -86,7 +86,10 @@ function renderSummaryLoading(message) {
 
 function renderSummaryCard(summary) {
   if (!summary || !Array.isArray(summary.rows) || !summary.rows.length) {
-    return renderSummaryLoading("No macro signal data found for the selected date.");
+    const msg = summary && summary.error
+      ? `Error: ${summary.error}`
+      : "No macro signal data found for the selected date.";
+    return renderSummaryLoading(msg);
   }
 
   const rows = summary.rows;

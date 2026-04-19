@@ -36,6 +36,12 @@ SELECT * FROM public.vw_macro_bond_treasury_summary;
 CREATE UNIQUE INDEX mv_macro_bond_treasury_summary_date_uniq
     ON public.mv_macro_bond_treasury_summary (date);
 
+CREATE MATERIALIZED VIEW public.mv_macro_signal_table AS
+SELECT * FROM public.vw_macro_signal_table;
+
+CREATE UNIQUE INDEX mv_macro_signal_table_date_signal_uniq
+    ON public.mv_macro_signal_table (date, signal_name);
+
 
 -- ============================================================
 -- 2. Report materialized views
@@ -802,6 +808,11 @@ BEGIN
     t_step := clock_timestamp();
     REFRESH MATERIALIZED VIEW public.mv_macro_bond_treasury_summary;
     RAISE NOTICE 'mv_macro_bond_treasury_summary refreshed in % ms',
+        extract(millisecond FROM clock_timestamp() - t_step)::int;
+
+    t_step := clock_timestamp();
+    REFRESH MATERIALIZED VIEW public.mv_macro_signal_table;
+    RAISE NOTICE 'mv_macro_signal_table refreshed in % ms',
         extract(millisecond FROM clock_timestamp() - t_step)::int;
 
     -- Report matviews (depend on intermediates above)
