@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from typing import Any, Iterable
 
 import psycopg2
@@ -182,6 +183,16 @@ def fetch_macro_summary(
             cur.execute(query, params)
             names = [desc[0] for desc in cur.description]
             rows = [dict(zip(names, row)) for row in cur.fetchall()]
+
+        _NUMERIC_KEYS = frozenset({
+            "chg_1d", "chg_5d", "chg_10d", "chg_20d",
+            "vs_dma_20", "vs_dma_50", "vs_dma_200", "wk_rvol",
+        })
+        for row in rows:
+            for key in _NUMERIC_KEYS:
+                val = row.get(key)
+                if isinstance(val, Decimal):
+                    row[key] = float(val)
 
         summary_date: str | None = None
         for row in rows:
