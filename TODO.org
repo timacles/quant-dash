@@ -6,6 +6,7 @@
    - breadth: pct above 20SMA
 *** bond ETFs view simpler
 - basic VOL, ret
+<<<<<<< HEAD
 *** FRED API
 - DXY, VIX
 - breadth: pct above 20SMA
@@ -13,6 +14,10 @@
 *** bond ETFs view simpler
  - where do I pull this from?
 *** [#A] FRED API
+=======
+** FRED API -- ??
+still needed, VIXY & VIXM & UUP as proxies
+>>>>>>> b280d6d (cleas todo)
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
