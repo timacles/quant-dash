@@ -76,8 +76,8 @@ def render_fragment(
   <div class="etf-report__summary" data-etf-summary>
     <div class="etf-report__card">
       <div class="etf-report__card-head">
-        <h2 class="etf-report__card-title">Macro Summary</h2>
-        <p class="etf-report__card-desc">Compact macro regime, leadership, bond internals, and top bond momentum.</p>
+        <h2 class="etf-report__card-title">Macro Signal Table</h2>
+        <p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p>
       </div>
       <div class="etf-report__empty">Loading data…</div>
     </div>

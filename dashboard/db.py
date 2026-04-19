@@ -161,13 +161,16 @@ def fetch_macro_summary(
     report_date: str | None,
 ) -> dict[str, Any]:
     try:
-        date_sql = sql.SQL("%s") if report_date else sql.SQL("(SELECT max(date) FROM public.mv_macro_signal_dashboard)")
+        date_sql = sql.SQL("%s") if report_date else sql.SQL("(SELECT max(date) FROM public.mv_macro_signal_table)")
         query = sql.SQL(
             """
-            SELECT *
-            FROM public.mv_macro_signal_dashboard
+            SELECT date, category, signal_name, source,
+                   chg_1d, chg_5d, chg_10d, chg_20d,
+                   vs_dma_20, vs_dma_50, vs_dma_200,
+                   wk_rvol, interpretation
+            FROM public.mv_macro_signal_table
             WHERE date = {date_sql}
-            LIMIT 1
+            ORDER BY category, signal_name
             """
         ).format(date_sql=date_sql)
 
@@ -178,42 +181,30 @@ def fetch_macro_summary(
         with conn.cursor() as cur:
             cur.execute(query, params)
             names = [desc[0] for desc in cur.description]
-            macro_row = cur.fetchone()
-            macro = dict(zip(names, macro_row)) if macro_row else None
+            rows = [dict(zip(names, row)) for row in cur.fetchall()]
 
-        summary_date = serialize_date(macro["date"]) if macro and macro.get("date") else serialize_date(report_date)
-        leaders: list[dict[str, Any]] = []
-        if summary_date:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT rank, symbol, display_name, bond_bucket, composite_score, date
-                    FROM public.mv_etf_report_bond_credit_performance
-                    WHERE date = %s
-                    ORDER BY rank
-                    LIMIT 3
-                    """,
-                    [summary_date],
-                )
-                names = [desc[0] for desc in cur.description]
-                leaders = [dict(zip(names, row)) for row in cur.fetchall()]
+        summary_date: str | None = None
+        for row in rows:
+            if row.get("date") is not None:
+                summary_date = serialize_date(row["date"])
+                row["date"] = summary_date
+                break
 
-        if macro and macro.get("date") is not None:
-            macro["date"] = serialize_date(macro["date"])
-        for row in leaders:
+        if not summary_date:
+            summary_date = serialize_date(report_date)
+
+        for row in rows:
             if row.get("date") is not None:
                 row["date"] = serialize_date(row["date"])
 
         return {
             "date": summary_date,
-            "macro": macro,
-            "bond_leaders": leaders,
+            "rows": rows,
         }
     except Exception:
         return {
             "date": serialize_date(report_date),
-            "macro": None,
-            "bond_leaders": [],
+            "rows": [],
         }
 
 

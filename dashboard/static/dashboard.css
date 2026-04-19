@@ -458,6 +458,39 @@
   margin-top: 24px;
 }
 
+.etf-report__macro-table td:first-child,
+.etf-report__macro-table th:first-child {
+  text-align: left;
+}
+
+.etf-report__macro-table td:nth-child(2),
+.etf-report__macro-table th:nth-child(2) {
+  text-align: left;
+}
+
+.etf-report__macro-table td:last-child,
+.etf-report__macro-table th:last-child {
+  text-align: left;
+  min-width: 160px;
+}
+
+.etf-report__macro-group-row td {
+  background: rgba(125, 211, 252, 0.08);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.etf-report__macro-interp {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .etf-report__analysis-pre {
   margin: 0;
   padding: 16px;

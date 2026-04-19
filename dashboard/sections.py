@@ -72,9 +72,18 @@ SECTIONS: tuple[SectionConfig, ...] = (
     ),
 )
 
-PERCENT_COLUMNS: frozenset[str] = frozenset({"ret_1d", "ret_3d", "ret_5d", "ret_10d", "rs_5", "rs_10"})
-SIGNED_COLUMNS: frozenset[str] = frozenset({"ret_1d", "ret_3d", "ret_5d", "ret_10d", "rs_5", "rs_10", "zscore_close_20", "atr_stretch_20"})
-DECIMAL_2_COLUMNS: frozenset[str] = frozenset({"rvol_20", "composite_score"})
+PERCENT_COLUMNS: frozenset[str] = frozenset({
+    "ret_1d", "ret_3d", "ret_5d", "ret_10d", "rs_5", "rs_10",
+    "chg_1d", "chg_5d", "chg_10d", "chg_20d",
+    "vs_dma_20", "vs_dma_50", "vs_dma_200",
+})
+SIGNED_COLUMNS: frozenset[str] = frozenset({
+    "ret_1d", "ret_3d", "ret_5d", "ret_10d", "rs_5", "rs_10",
+    "zscore_close_20", "atr_stretch_20",
+    "chg_1d", "chg_5d", "chg_10d", "chg_20d",
+    "vs_dma_20", "vs_dma_50", "vs_dma_200",
+})
+DECIMAL_2_COLUMNS: frozenset[str] = frozenset({"rvol_20", "composite_score", "wk_rvol"})
 DECIMAL_3_COLUMNS: frozenset[str] = frozenset({
     "zscore_close_20",
     "atr_stretch_20",

@@ -80,48 +80,73 @@ function renderCell(column, row) {
   return `<td class="${classes}" data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(formatValue(column, row[column]))}</td>`;
 }
 
-function formatSummaryPercent(value) {
-  if (value == null) return "—";
-  const number = Number(value);
-  return `${number >= 0 ? "+" : ""}${(number * 100).toFixed(2)}%`;
-}
-
 function renderSummaryLoading(message) {
-  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Summary</h2><p class="etf-report__card-desc">Compact macro regime, leadership, bond internals, and top bond momentum.</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
+  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
 }
 
 function renderSummaryCard(summary) {
-  if (!summary || !summary.macro) {
-    return renderSummaryLoading("No macro summary data found for the selected date.");
+  if (!summary || !Array.isArray(summary.rows) || !summary.rows.length) {
+    return renderSummaryLoading("No macro signal data found for the selected date.");
   }
 
-  const macro = summary.macro;
-  const leaders = Array.isArray(summary.bond_leaders) ? summary.bond_leaders : [];
-  const asOfDate = summary.date || macro.date || "—";
+  const rows = summary.rows;
+  const asOfDate = summary.date || rows[0].date || "—";
 
-  const statusCards = [
-    ["Macro Regime", macro.macro_regime || "—"],
-    ["Credit Risk", macro.credit_risk_on_flag == null ? "—" : (macro.credit_risk_on_flag ? "ON" : "OFF")],
-    ["Duration Bid", macro.duration_bid_flag == null ? "—" : (macro.duration_bid_flag ? "ON" : "OFF")],
-    ["Inflation", macro.inflation_bid_flag == null ? "—" : (macro.inflation_bid_flag ? "ON" : "OFF")],
-  ].map(([label, value]) => `<div class="etf-report__summary-box"><div class="etf-report__summary-label">${escapeHtml(label)}</div><div class="etf-report__summary-value">${escapeHtml(String(value))}</div></div>`).join("");
+  const columns = [
+    { key: "signal_name", label: "Signal" },
+    { key: "source", label: "Source" },
+    { key: "chg_1d", label: "1D" },
+    { key: "chg_5d", label: "5D" },
+    { key: "chg_10d", label: "10D" },
+    { key: "chg_20d", label: "20D" },
+    { key: "vs_dma_20", label: "vs 20" },
+    { key: "vs_dma_50", label: "vs 50" },
+    { key: "vs_dma_200", label: "vs 200" },
+    { key: "wk_rvol", label: "RVol" },
+    { key: "interpretation", label: "Interpretation" },
+  ];
 
-  const leadershipItems = [
-    ["IWM/SPY 20D", macro.iwm_spy_ratio_ret_20d],
-    ["QQQ/SPY 20D", macro.qqq_spy_ratio_ret_20d],
-    ["HYG/LQD 20D", macro.hyg_lqd_ratio_ret_20d],
-  ].map(([label, value]) => `<div class="etf-report__summary-item"><span class="etf-report__summary-label">${escapeHtml(label)}</span><span class="etf-report__value${valueClass("ret_5d", value)}">${escapeHtml(formatSummaryPercent(value))}</span></div>`).join("");
+  const groups = [];
+  const groupMap = {};
+  for (const row of rows) {
+    const cat = row.category || "Other";
+    if (!groupMap[cat]) {
+      groupMap[cat] = [];
+      groups.push(cat);
+    }
+    groupMap[cat].push(row);
+  }
 
-  const bondItems = [
-    ["Credit Spread Proxy 20D", macro.credit_spread_proxy_20d],
-    ["Duration Spread Proxy 20D", macro.duration_spread_proxy_20d],
-  ].map(([label, value]) => `<div class="etf-report__summary-item"><span class="etf-report__summary-label">${escapeHtml(label)}</span><span class="etf-report__value${valueClass("ret_5d", value)}">${escapeHtml(formatSummaryPercent(value))}</span></div>`).join("");
+  const headerHtml = columns
+    .map((col) => `<th>${escapeHtml(col.label)}</th>`)
+    .join("");
 
-  const leaderRows = leaders.length
-    ? leaders.map((row) => `<tr><td>${escapeHtml(String(row.rank ?? "—"))}</td><td><span class="etf-report__symbol">${escapeHtml(row.symbol ?? "")}</span></td><td>${escapeHtml(row.display_name ?? "")}</td><td>${escapeHtml(row.bond_bucket ?? "—")}</td><td>${escapeHtml(row.composite_score == null ? "—" : Number(row.composite_score).toFixed(2))}</td></tr>`).join("")
-    : `<tr><td colspan="5">No qualifying rows.</td></tr>`;
+  let bodyHtml = "";
+  for (const cat of groups) {
+    const catRows = groupMap[cat];
+    bodyHtml += `<tr class="etf-report__macro-group-row"><td colspan="${columns.length}">${escapeHtml(cat)}</td></tr>`;
+    for (const row of catRows) {
+      bodyHtml += "<tr>";
+      for (const col of columns) {
+        const value = row[col.key];
+        if (col.key === "interpretation") {
+          bodyHtml += `<td class="etf-report__macro-interp">${escapeHtml(value == null ? "—" : String(value))}</td>`;
+        } else if (["chg_1d", "chg_5d", "chg_10d", "chg_20d", "vs_dma_20", "vs_dma_50", "vs_dma_200"].includes(col.key)) {
+          const cls = valueClass("ret_5d", value);
+          const formatted = value == null ? "—" : `${(Number(value) * 100).toFixed(2)}%`;
+          bodyHtml += `<td class="etf-report__value${cls}">${escapeHtml(formatted)}</td>`;
+        } else if (col.key === "wk_rvol") {
+          const formatted = value == null ? "—" : Number(value).toFixed(2);
+          bodyHtml += `<td>${escapeHtml(formatted)}</td>`;
+        } else {
+          bodyHtml += `<td>${escapeHtml(value == null ? "—" : String(value))}</td>`;
+        }
+      }
+      bodyHtml += "</tr>";
+    }
+  }
 
-  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Summary</h2><p class="etf-report__card-desc">Compact macro regime, leadership, bond internals, and top bond momentum.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ${escapeHtml(asOfDate)}</span></div></div><div class="etf-report__summary-grid"><div class="etf-report__summary-status">${statusCards}</div><div class="etf-report__summary-panels"><div class="etf-report__summary-box"><div class="etf-report__summary-label">Cross-Asset Leadership</div><div class="etf-report__summary-list">${leadershipItems}</div></div><div class="etf-report__summary-box"><div class="etf-report__summary-label">Bond Internals</div><div class="etf-report__summary-list">${bondItems}</div></div><div class="etf-report__summary-box"><div class="etf-report__summary-label">Top Bond Momentum</div><table class="etf-report__summary-table"><thead><tr><th>Rank</th><th>Ticker</th><th>Name</th><th>Bucket</th><th>Score</th></tr></thead><tbody>${leaderRows}</tbody></table></div></div></div></div>`;
+  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ${escapeHtml(asOfDate)}</span><span class="etf-report__badge">${rows.length} signals</span></div></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
 }
 
 function renderSection(section, rows, limitValue) {
