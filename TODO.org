@@ -7,10 +7,26 @@
 *** bond ETFs view simpler
 - basic VOL, ret
 *** FRED API
+- DXY, VIX
+- breadth: pct above 20SMA
+- basic VOL, ret
+*** bond ETFs view simpler
+ - where do I pull this from?
+*** [#A] FRED API
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
+** ETF discrepancies endpoint
+** add graph visualizations
+** TODO [#A] speed up DB views
+- mat views?
+** =pull_stats/= endpoint
+- displays last pulled
+** Other
+*** Range of numbers coloring
+or top 3 get highlighted
+*** ETF metadata editor
 * Later
 ** industry leader stocks
 - scrape from finviz
