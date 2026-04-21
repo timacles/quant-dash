@@ -15,9 +15,6 @@
 ** industry leader stocks
 - scrape from finviz
 - by volume descending
-
-** =pull_stats/= endpoint
-- displays last pulled
 ** JSON export to LLM analysis
    - import json -> DB from llm analysis
    - =vw_llm_market_analysis=
