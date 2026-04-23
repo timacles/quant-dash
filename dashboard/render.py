@@ -23,6 +23,7 @@ def render_fragment(
     selected_date: str | None,
     db_config: dict[str, Any] | None = None,
 ) -> str:
+    sections = list(sections_config)
     date_value = escape(selected_date or "")
     sections_json = escape(
         json.dumps(
@@ -34,19 +35,23 @@ def render_fragment(
                     "columns": list(section.columns),
                     "column_labels": section.column_labels,
                 }
-                for section in sections_config
+                for section in sections
             ]
         )
     )
     loading_sections = "".join(
         (
-            "<div class='etf-report__card'>"
+            f"<div class='etf-report__card' id='section-{escape(section.key)}'>"
             f"<div class='etf-report__card-head'><h2 class='etf-report__card-title'>{escape(section.title)}</h2>"
             f"<p class='etf-report__card-desc'>{escape(section.description)}</p></div>"
             "<div class='etf-report__empty'>Loading data…</div>"
             "</div>"
         )
-        for section in sections_config
+        for section in sections
+    )
+    toc_links = "".join(
+        f"<a class='etf-report__toc-link' href='#section-{escape(section.key)}'>{escape(section.title)}</a>"
+        for section in sections
     )
 
     return f"""
@@ -73,6 +78,12 @@ def render_fragment(
       </form>
     </div>
   </div>
+  <nav class="etf-report__toc" aria-label="Table of contents">
+    <div class="etf-report__toc-label">Sections</div>
+    <div class="etf-report__toc-links">
+      {toc_links}
+    </div>
+  </nav>
   <div class="etf-report__summary" data-etf-summary>
     <div class="etf-report__card">
       <div class="etf-report__card-head">

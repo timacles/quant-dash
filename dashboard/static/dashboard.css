@@ -189,6 +189,49 @@
   gap: 18px;
 }
 
+.etf-report__toc {
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(8, 11, 17, 0.9);
+}
+
+.etf-report__toc-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.etf-report__toc-links {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.etf-report__toc-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(20, 26, 37, 0.98);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.etf-report__toc-link:hover,
+.etf-report__toc-link:focus-visible {
+  color: var(--accent);
+  border-color: rgba(255, 208, 113, 0.65);
+}
+
 .etf-report__card {
   background: linear-gradient(180deg, rgba(19, 23, 33, 0.95), rgba(13, 16, 23, 0.98));
   border: 1px solid var(--line);
@@ -502,6 +545,14 @@
   color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.etf-report {
+  scroll-behavior: smooth;
+}
+
+.etf-report__card[id^="section-"] {
+  scroll-margin-top: 20px;
 }
 
 @media (max-width: 900px) {

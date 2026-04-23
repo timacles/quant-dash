@@ -152,10 +152,15 @@ function renderSummaryCard(summary) {
   return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ${escapeHtml(asOfDate)}</span><span class="etf-report__badge">${rows.length} signals</span></div></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
 }
 
+function sectionAnchorId(sectionKey) {
+  return `section-${sectionKey}`;
+}
+
 function renderSection(section, rows, limitValue) {
   const sectionControls = `<form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form>`;
+  const cardId = sectionAnchorId(section.key);
   if (!rows.length) {
-    return `<div class="etf-report__card" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">No qualifying rows for the selected date.</div></div>`;
+    return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">No qualifying rows for the selected date.</div></div>`;
   }
 
   const asOfDate = rows[0].date;
@@ -174,7 +179,7 @@ function renderSection(section, rows, limitValue) {
     badges.splice(1, 0, `<span class="etf-report__badge">Market Regime: ${escapeHtml(marketRegime)}</span>`);
   }
 
-  return `<div class="etf-report__card" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p><div class="etf-report__card-meta">${badges.join("")}</div></div><div class="etf-report__table-wrap"><table class="etf-report__table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
+  return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p><div class="etf-report__card-meta">${badges.join("")}</div></div><div class="etf-report__table-wrap"><table class="etf-report__table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
 }
 
 function initTableSorters(root) {
@@ -262,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderLoadingCard(section, message, limitValue) {
-    return `<div class="etf-report__card" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2><form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form></div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
+    return `<div class="etf-report__card" id="${escapeHtml(sectionAnchorId(section.key))}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2><form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form></div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
   }
 
   function renderLoadingState() {
