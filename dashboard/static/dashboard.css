@@ -1,25 +1,36 @@
+html,
+body {
+  background: #101010 !important;
+}
+
 .etf-report {
-  --bg: #080B11;
-  --panel: #0F141D;
-  --panel-2: #161D29;
-  --line: rgba(120, 132, 156, 0.68);
-  --text: #EDF1F7;
-  --muted: #AEB8C6;
-  --accent: #FFD071;
-  --accent-2: #FF8F40;
-  --good: #9EEA62;
-  --bad: #FF7B7B;
-  --warn: #FF8F40;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  --bg: #101010;
+  --panel: #1c1c1c;
+  --panel-2: #151515;
+  --line: rgba(77, 77, 77, 0.92);
+  --text: #66ff66;
+  --muted: #69b8ce;
+  --accent: #70ff70;
+  --accent-2: #5a9dc8;
+  --link: #5a9dc8;
+  --good: #70ff70;
+  --bad: #f00060;
+  --warn: #f9fd80;
+  --magenta: #b29fdb;
+  --cyan: #69b8ce;
+  --white: #eeeeee;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.72), 0 0 36px rgba(96, 255, 96, 0.08);
   color: var(--text);
   background:
-    radial-gradient(ellipse at top right, rgba(230, 180, 80, 0.04), transparent 45%),
-    linear-gradient(180deg, #0D1017 0%, #0B0E14 100%);
+    linear-gradient(rgba(96, 255, 96, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 255, 96, 0.025) 1px, transparent 1px),
+    linear-gradient(180deg, #101010 0%, #0b0b0b 100%);
+  background-size: 28px 28px, 28px 28px, auto;
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: 6px;
   box-shadow: var(--shadow);
   padding: 28px;
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", monospace;
   color-scheme: dark;
 }
 
@@ -48,8 +59,8 @@
   margin-bottom: 22px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: rgba(8, 11, 17, 0.94);
+  border-radius: 6px;
+  background: rgba(16, 16, 16, 0.94);
 }
 
 .etf-report__utility-label {
@@ -71,8 +82,8 @@
   align-items: center;
   padding: 7px 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(20, 26, 37, 0.98);
+  border-radius: 4px;
+  background: rgba(28, 28, 28, 0.98);
   color: var(--text);
   font-size: 12px;
   font-weight: 700;
@@ -83,8 +94,8 @@
 
 .etf-report__utility-link:hover,
 .etf-report__utility-link:focus-visible {
-  border-color: rgba(255, 208, 113, 0.65);
-  background: rgba(31, 39, 54, 0.98);
+  border-color: rgba(112, 255, 112, 0.68);
+  background: rgba(16, 16, 16, 0.98);
   color: var(--accent);
 }
 
@@ -109,7 +120,7 @@
   margin: 0;
   font-size: clamp(30px, 4vw, 40px);
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .etf-report__subtitle {
@@ -130,7 +141,7 @@
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -139,27 +150,27 @@
 }
 
 .etf-report__env-badge--dev {
-  color: #E6B450;
-  background: rgba(230, 180, 80, 0.08);
-  border-color: rgba(230, 180, 80, 0.25);
+  color: #f9fd80;
+  background: rgba(249, 253, 128, 0.08);
+  border-color: rgba(249, 253, 128, 0.32);
 }
 
 .etf-report__env-badge--stage {
-  color: #FF8F40;
-  background: rgba(255, 143, 64, 0.08);
-  border-color: rgba(255, 143, 64, 0.25);
+  color: #b29fdb;
+  background: rgba(178, 159, 219, 0.08);
+  border-color: rgba(178, 159, 219, 0.32);
 }
 
 .etf-report__env-badge--prod {
-  color: #AAD94C;
-  background: rgba(170, 217, 76, 0.08);
-  border-color: rgba(170, 217, 76, 0.25);
+  color: #70ff70;
+  background: rgba(112, 255, 112, 0.08);
+  border-color: rgba(112, 255, 112, 0.32);
 }
 
 .etf-report__env-badge--db {
-  color: #D2A6FF;
-  background: rgba(210, 166, 255, 0.08);
-  border-color: rgba(210, 166, 255, 0.25);
+  color: #69b8ce;
+  background: rgba(105, 184, 206, 0.08);
+  border-color: rgba(105, 184, 206, 0.32);
 }
 
 .etf-report__filter-form {
@@ -172,8 +183,8 @@
 .etf-report__date-input,
 .etf-report__button {
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(8, 11, 17, 0.92);
+  border-radius: 4px;
+  background: rgba(16, 16, 16, 0.92);
   color: var(--text);
   padding: 10px 14px;
   font: inherit;
@@ -181,6 +192,13 @@
 
 .etf-report__button {
   cursor: pointer;
+}
+
+.etf-report__date-input:focus-visible,
+.etf-report__button:focus-visible {
+  border-color: var(--accent);
+  outline: 2px solid rgba(112, 255, 112, 0.28);
+  outline-offset: 2px;
 }
 
 .etf-report__grid {
@@ -193,8 +211,8 @@
   margin-bottom: 18px;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: rgba(8, 11, 17, 0.9);
+  border-radius: 6px;
+  background: rgba(16, 16, 16, 0.9);
 }
 
 .etf-report__toc-label {
@@ -217,8 +235,8 @@
   align-items: center;
   padding: 8px 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(20, 26, 37, 0.98);
+  border-radius: 4px;
+  background: rgba(28, 28, 28, 0.98);
   color: var(--text);
   text-decoration: none;
   font-size: 12px;
@@ -229,13 +247,13 @@
 .etf-report__toc-link:hover,
 .etf-report__toc-link:focus-visible {
   color: var(--accent);
-  border-color: rgba(255, 208, 113, 0.65);
+  border-color: rgba(112, 255, 112, 0.68);
 }
 
 .etf-report__card {
-  background: linear-gradient(180deg, rgba(19, 23, 33, 0.95), rgba(13, 16, 23, 0.98));
+  background: linear-gradient(180deg, rgba(28, 28, 28, 0.96), rgba(16, 16, 16, 0.98));
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 6px;
   overflow: hidden;
   width: 100%;
 }
@@ -243,7 +261,7 @@
 .etf-report__card-head {
   padding: 18px 20px 14px;
   border-bottom: 1px solid var(--line);
-  background: rgba(230, 180, 80, 0.05);
+  background: rgba(96, 255, 96, 0.055);
 }
 
 .etf-report__card-title {
@@ -291,8 +309,8 @@
 .etf-report__section-filter-input {
   width: 76px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(8, 11, 17, 0.92);
+  border-radius: 4px;
+  background: rgba(16, 16, 16, 0.92);
   color: var(--text);
   padding: 8px 12px;
   font: inherit;
@@ -301,11 +319,11 @@
 
 .etf-report__badge {
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 4px;
   font-size: 12px;
   color: var(--muted);
   border: 1px solid var(--line);
-  background: rgba(8, 11, 17, 0.85);
+  background: rgba(16, 16, 16, 0.85);
 }
 
 .etf-report__table-wrap {
@@ -336,8 +354,8 @@
 
 .etf-report__summary-box {
   border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(8, 11, 17, 0.72);
+  border-radius: 6px;
+  background: rgba(16, 16, 16, 0.72);
   padding: 14px;
 }
 
@@ -353,7 +371,7 @@
   margin-top: 8px;
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .etf-report__summary-list {
@@ -420,7 +438,7 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: rgba(8, 11, 17, 0.99);
+  background: rgba(16, 16, 16, 0.99);
   color: var(--muted);
   font-size: 11px;
   font-weight: 700;
@@ -431,7 +449,7 @@
 }
 
 .etf-report__table th:hover {
-  color: var(--text);
+  color: var(--accent);
 }
 
 .etf-report__table th:first-child,
@@ -472,15 +490,15 @@
 }
 
 .etf-report__value--vol-high {
-  color: #AAD94C;
+  color: #70ff70;
 }
 
 .etf-report__value--vol-low {
-  color: #E6B450;
+  color: #f9fd80;
 }
 
 .etf-report__value--vol-extreme {
-  color: #D2A6FF;
+  color: #b29fdb;
 }
 
 .etf-report__sort-indicator {
@@ -517,7 +535,7 @@
 }
 
 .etf-report__macro-group-row td {
-  background: rgba(230, 180, 80, 0.06);
+  background: rgba(96, 255, 96, 0.06);
   color: var(--accent);
   font-size: 11px;
   font-weight: 700;
@@ -536,9 +554,9 @@
 .etf-report__analysis-pre {
   margin: 0;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 6px;
   border: 1px solid var(--line);
-  background: rgba(8, 11, 17, 0.85);
+  background: rgba(16, 16, 16, 0.85);
   font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", monospace;
   font-size: 12px;
   line-height: 1.5;
@@ -558,7 +576,7 @@
 @media (max-width: 900px) {
   .etf-report {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: 6px;
   }
 
   .etf-report__hero {

@@ -1,4 +1,4 @@
-# AGENTS.md
+ AGENTS.md
 
 This directory is for a quant momentum dashboard to assist with trading.
 The backbone of this structure is the database table `etf_flows`, which contains
@@ -91,9 +91,5 @@ Structure:
 1. Add a handler function in `dashboard/routes.py`
 2. Register it with one `if path == "..."` line in `app()` in `serve_dashboard.py`
 3. For routes that support both GET and POST, dispatch on `environ.get("REQUEST_METHOD")` inside the `app()` block
-
-### Change styles or client-side behaviour
-- Edit `dashboard/static/dashboard.css` or `dashboard/static/dashboard.js` directly
-- No Python changes needed
 
 
