@@ -7,6 +7,9 @@ body {
   --bg: #101010;
   --panel: #1c1c1c;
   --panel-2: #151515;
+  --table-row: rgba(4, 4, 4, 0.94);
+  --table-row-alt: rgba(9, 9, 9, 0.98);
+  --table-row-hover: rgba(14, 14, 14, 0.99);
   --line: rgba(77, 77, 77, 0.92);
   --text: #66ff66;
   --muted: #69b8ce;
@@ -419,6 +422,18 @@ body {
   text-align: left;
 }
 
+.etf-report__summary-table tbody tr {
+  background: var(--table-row);
+}
+
+.etf-report__summary-table tbody tr:nth-child(even) {
+  background: var(--table-row-alt);
+}
+
+.etf-report__summary-table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
 .etf-report__table {
   width: 100%;
   border-collapse: collapse;
@@ -459,6 +474,18 @@ body {
 .etf-report__table th:nth-child(3),
 .etf-report__table td:nth-child(3) {
   text-align: left;
+}
+
+.etf-report__table tbody tr {
+  background: var(--table-row);
+}
+
+.etf-report__table tbody tr:nth-child(even) {
+  background: var(--table-row-alt);
+}
+
+.etf-report__table tbody tr:hover {
+  background: var(--table-row-hover);
 }
 
 .etf-report__symbol-link {
