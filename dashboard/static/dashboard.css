@@ -326,7 +326,7 @@ body {
   font-size: 12px;
   color: var(--muted);
   border: 1px solid var(--line);
-  background: rgba(16, 16, 16, 0.85);
+  background: rgba(5, 5, 5, 0.85);
 }
 
 .etf-report__table-wrap {
@@ -489,7 +489,7 @@ body {
 }
 
 .etf-report__symbol-link {
-  color: inherit;
+  color: var(--white);
   text-decoration: none;
 }
 .etf-report__symbol-link:hover .etf-report__symbol {
@@ -497,15 +497,22 @@ body {
 }
 
 .etf-report__symbol {
+  color: inherit;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
 
 .etf-report__name {
-  color: var(--muted);
+  color: var(--white);
   display: block;
   margin-top: 2px;
   font-size: 12px;
+}
+
+.etf-report__display-name,
+.etf-report__macro-signal,
+.etf-report__macro-source {
+  color: var(--white);
 }
 
 .etf-report__value--pos {

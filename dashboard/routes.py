@@ -39,6 +39,9 @@ _CONFIG_PAGE: str = (_TEMPLATES_DIR / "config.html").read_text(encoding="utf-8")
 _STATIC_MIME: dict[str, str] = {
     ".css": "text/css; charset=utf-8",
     ".js": "application/javascript; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".png": "image/png",
 }
 
 

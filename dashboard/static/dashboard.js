@@ -74,7 +74,7 @@ function renderCell(column, row) {
     return `<td data-sort-value="${escapeHtml(sortValue(column, sym))}"><a class="etf-report__symbol-link" href="${finvizUrl}" target="_blank" rel="noopener noreferrer"><span class="etf-report__symbol">${escapeHtml(sym)}</span></a><span class="etf-report__name">${escapeHtml(row.asset_class ?? "")}</span></td>`;
   }
   if (column === "display_name") {
-    return `<td data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(row[column] ?? "")}</td>`;
+    return `<td class="etf-report__display-name" data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(row[column] ?? "")}</td>`;
   }
   const classes = `etf-report__value${valueClass(column, row[column])}`.trim();
   return `<td class="${classes}" data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(formatValue(column, row[column]))}</td>`;
@@ -134,6 +134,10 @@ function renderSummaryCard(summary) {
         const value = row[col.key];
         if (col.key === "interpretation") {
           bodyHtml += `<td class="etf-report__macro-interp">${escapeHtml(value == null ? "—" : String(value))}</td>`;
+        } else if (col.key === "signal_name") {
+          bodyHtml += `<td class="etf-report__macro-signal">${escapeHtml(value == null ? "—" : String(value))}</td>`;
+        } else if (col.key === "source") {
+          bodyHtml += `<td class="etf-report__macro-source">${escapeHtml(value == null ? "—" : String(value))}</td>`;
         } else if (["chg_1d", "chg_5d", "chg_10d", "chg_20d", "vs_dma_20", "vs_dma_50", "vs_dma_200"].includes(col.key)) {
           const cls = valueClass("ret_5d", value);
           const formatted = value == null ? "—" : `${(Number(value) * 100).toFixed(2)}%`;

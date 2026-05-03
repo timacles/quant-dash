@@ -96,15 +96,6 @@ def render_fragment(
   <div class="etf-report__grid" data-etf-grid>
     {loading_sections}
   </div>
-  <div class="etf-report__analysis" data-etf-analysis>
-    <div class="etf-report__card">
-      <div class="etf-report__card-head">
-        <h2 class="etf-report__card-title">Analysis</h2>
-        <p class="etf-report__card-desc">Notes derived from the etf_analysis table.</p>
-      </div>
-      <div class="etf-report__empty">Loading analysis…</div>
-    </div>
-  </div>
 </section>
 <script src="/static/dashboard.js"></script>
 """.strip()
@@ -117,6 +108,7 @@ def render_document(fragment: str, title: str) -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 </head>
 <body style="margin:0; padding:24px; background:#030712;">
 {fragment}

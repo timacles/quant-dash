@@ -2,7 +2,6 @@
 
 * Main 
 ** Spec Strategy
-- keep changes scope
 - each implementation path should have its own instructions/plan file
 ** Theme View Card
    - [ ] leader/laggards
