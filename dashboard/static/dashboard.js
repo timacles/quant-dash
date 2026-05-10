@@ -275,9 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderLoadingState() {
-    if (summaryContainer) {
-      summaryContainer.innerHTML = renderSummaryLoading("Loading data…");
-    }
+    // summaryContainer is left as-is (shows link to /macro-signals)
     if (!grid) return;
     grid.innerHTML = sections
       .map((section) => renderLoadingCard(section, "Loading data…", sectionLimits[section.key]))
@@ -285,9 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderErrorState(message) {
-    if (summaryContainer) {
-      summaryContainer.innerHTML = renderSummaryLoading(message);
-    }
+    // summaryContainer is left as-is (shows link to /macro-signals)
     if (!grid) return;
     grid.innerHTML = `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Data unavailable</h2><p class="etf-report__card-desc">The report shell loaded, but the section data request failed.</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
     if (analysisContainer) {
@@ -344,9 +340,7 @@ async function loadSections(dateValue) {
       grid.innerHTML = sections
         .map((section) => renderSection(section, payload.sections[section.key] || [], sectionLimits[section.key] || DEFAULT_SECTION_LIMIT))
         .join("");
-      if (summaryContainer) {
-        summaryContainer.innerHTML = renderSummaryCard(payload.macro_summary || null);
-      }
+      // summaryContainer is left as-is (shows link to /macro-signals)
       initTableSorters(grid);
       if (analysisContainer) {
         analysisContainer.innerHTML = renderAnalysisCard(payload.analysis || null);

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Macro Signals — qDash</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body style="margin:0; padding:24px; background:#030712;">
+  <section class="etf-report" style="max-width:1400px;margin:0 auto;">
+    <div class="etf-report__utility-bar">
+      <div class="etf-report__utility-label">Macro Signals</div>
+      <div class="etf-report__utility-links">
+        <a class="etf-report__utility-link" href="/">&larr; Dashboard</a>
+      </div>
+    </div>
+
+    <div class="etf-report__hero">
+      <div>
+        <div class="etf-report__eyebrow">Cross-Asset Signal Monitor</div>
+        <h1 class="etf-report__title">Macro Signal Table</h1>
+        <p class="etf-report__subtitle">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p>
+      </div>
+      <div class="etf-report__meta">
+        <form class="etf-report__filter-form" method="get" data-macro-filter-form>
+          <input class="etf-report__date-input" type="date" name="date" data-macro-date-input onchange="this.form.requestSubmit()">
+        </form>
+      </div>
+    </div>
+
+    <div class="etf-report__summary" data-macro-summary>
+      <div class="etf-report__card">
+        <div class="etf-report__card-head">
+          <h2 class="etf-report__card-title">Macro Signal Table</h2>
+          <p class="etf-report__card-desc">Loading data…</p>
+        </div>
+        <div class="etf-report__empty">Loading data…</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#x27;");
+    }
+
+    function valueClass(column, value) {
+      if (value == null) return "";
+      if (!["chg_1d","chg_5d","chg_10d","chg_20d","vs_dma_20","vs_dma_50","vs_dma_200"].includes(column)) return "";
+      var n = Number(value);
+      if (n > 0) return " etf-report__value--pos";
+      if (n < 0) return " etf-report__value--neg";
+      return "";
+    }
+
+    function renderMacroCard(summary) {
+      if (!summary || !Array.isArray(summary.rows) || !summary.rows.length) {
+        var msg = summary && summary.error ? "Error: " + summary.error : "No macro signal data found for the selected date.";
+        return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">' + escapeHtml(msg) + '</div></div>';
+      }
+
+      var rows = summary.rows;
+      var asOfDate = summary.date || rows[0].date || "\u2014";
+
+      var columns = [
+        { key: "signal_name", label: "Signal" },
+        { key: "source", label: "Source" },
+        { key: "chg_1d", label: "1D" },
+        { key: "chg_5d", label: "5D" },
+        { key: "chg_10d", label: "10D" },
+        { key: "chg_20d", label: "20D" },
+        { key: "vs_dma_20", label: "vs 20" },
+        { key: "vs_dma_50", label: "vs 50" },
+        { key: "vs_dma_200", label: "vs 200" },
+        { key: "wk_rvol", label: "RVol" },
+        { key: "interpretation", label: "Interpretation" },
+      ];
+
+      var groups = [];
+      var groupMap = {};
+      for (var i = 0; i < rows.length; i++) {
+        var cat = rows[i].category || "Other";
+        if (!groupMap[cat]) {
+          groupMap[cat] = [];
+          groups.push(cat);
+        }
+        groupMap[cat].push(rows[i]);
+      }
+
+      var headerHtml = columns.map(function (col) { return "<th>" + escapeHtml(col.label) + "</th>"; }).join("");
+
+      var bodyHtml = "";
+      for (var g = 0; g < groups.length; g++) {
+        var catName = groups[g];
+        var catRows = groupMap[catName];
+        bodyHtml += '<tr class="etf-report__macro-group-row"><td colspan="' + columns.length + '">' + escapeHtml(catName) + '</td></tr>';
+        for (var r = 0; r < catRows.length; r++) {
+          var row = catRows[r];
+          bodyHtml += "<tr>";
+          for (var c = 0; c < columns.length; c++) {
+            var col = columns[c];
+            var value = row[col.key];
+            if (col.key === "interpretation") {
+              bodyHtml += '<td class="etf-report__macro-interp">' + escapeHtml(value == null ? "\u2014" : String(value)) + '</td>';
+            } else if (col.key === "signal_name") {
+              bodyHtml += '<td class="etf-report__macro-signal">' + escapeHtml(value == null ? "\u2014" : String(value)) + '</td>';
+            } else if (col.key === "source") {
+              bodyHtml += '<td class="etf-report__macro-source">' + escapeHtml(value == null ? "\u2014" : String(value)) + '</td>';
+            } else if (["chg_1d","chg_5d","chg_10d","chg_20d","vs_dma_20","vs_dma_50","vs_dma_200"].includes(col.key)) {
+              var cls = valueClass(col.key, value);
+              var formatted = value == null ? "\u2014" : (Number(value) * 100).toFixed(2) + "%";
+              bodyHtml += '<td class="etf-report__value' + cls + '">' + escapeHtml(formatted) + '</td>';
+            } else if (col.key === "wk_rvol") {
+              var formatted = value == null ? "\u2014" : Number(value).toFixed(2);
+              bodyHtml += "<td>" + escapeHtml(formatted) + "</td>";
+            } else {
+              bodyHtml += "<td>" + escapeHtml(value == null ? "\u2014" : String(value)) + "</td>";
+            }
+          }
+          bodyHtml += "</tr>";
+        }
+      }
+
+      return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ' + escapeHtml(asOfDate) + '</span><span class="etf-report__badge">' + rows.length + ' signals</span></div></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>' + headerHtml + '</tr></thead><tbody>' + bodyHtml + '</tbody></table></div></div>';
+    }
+
+    function loadMacroSignals(dateValue) {
+      var container = document.querySelector("[data-macro-summary]");
+      if (!container) return;
+
+      var url = new URL("/api/macro-summary", window.location.origin);
+      if (dateValue) url.searchParams.set("date", dateValue);
+
+      fetch(url)
+        .then(function (resp) {
+          if (!resp.ok) throw new Error("Request failed with status " + resp.status);
+          return resp.json();
+        })
+        .then(function (payload) {
+          container.innerHTML = renderMacroCard(payload);
+
+          var dateInput = document.querySelector("[data-macro-date-input]");
+          if (dateInput && payload.date) dateInput.value = payload.date;
+
+          var pageUrl = new URL(window.location.href);
+          if (payload.date) {
+            pageUrl.searchParams.set("date", payload.date);
+          } else {
+            pageUrl.searchParams.delete("date");
+          }
+          window.history.replaceState({}, "", pageUrl);
+        })
+        .catch(function (err) {
+          container.innerHTML = '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">' + escapeHtml(err.message) + '</div></div>';
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var form = document.querySelector("[data-macro-filter-form]");
+      var dateInput = document.querySelector("[data-macro-date-input]");
+
+      if (form) {
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          loadMacroSignals(dateInput ? dateInput.value : "");
+        });
+      }
+
+      var initialDate = "";
+      if (dateInput && dateInput.value) {
+        initialDate = dateInput.value;
+      }
+
+      if (initialDate) {
+        loadMacroSignals(initialDate);
+      } else {
+        fetch("/api/latest-date")
+          .then(function (resp) { return resp.json(); })
+          .then(function (payload) {
+            var d = payload.date || "";
+            if (dateInput && d) dateInput.value = d;
+            loadMacroSignals(d);
+          })
+          .catch(function () {
+            loadMacroSignals("");
+          });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -61,6 +61,7 @@ def render_fragment(
     <div class="etf-report__utility-label">Operations</div>
     <div class="etf-report__utility-links">
       <a class="etf-report__utility-link" href="/pull_stats">Pull Stats</a>
+      <a class="etf-report__utility-link" href="/macro-signals">Macro Signals</a>
       <a class="etf-report__utility-link" href="/config">Config</a>
     </div>
   </div>
@@ -81,6 +82,7 @@ def render_fragment(
   <nav class="etf-report__toc" aria-label="Table of contents">
     <div class="etf-report__toc-label">Sections</div>
     <div class="etf-report__toc-links">
+      <a class="etf-report__toc-link" href="/macro-signals">Macro Signals</a>
       {toc_links}
     </div>
   </nav>
@@ -90,7 +92,9 @@ def render_fragment(
         <h2 class="etf-report__card-title">Macro Signal Table</h2>
         <p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p>
       </div>
-      <div class="etf-report__empty">Loading data…</div>
+      <div class="etf-report__card-meta" style="padding:14px 22px 18px;">
+        <a class="etf-report__utility-link" href="/macro-signals" style="font-size:13px;">View Full Macro Signals &rarr;</a>
+      </div>
     </div>
   </div>
   <div class="etf-report__grid" data-etf-grid>

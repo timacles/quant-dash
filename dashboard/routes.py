@@ -35,6 +35,7 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 _PULL_STATS_PAGE: str = (_TEMPLATES_DIR / "pull_stats.html").read_text(encoding="utf-8")
 _CONFIG_PAGE: str = (_TEMPLATES_DIR / "config.html").read_text(encoding="utf-8")
+_MACRO_SIGNALS_PAGE: str = (_TEMPLATES_DIR / "macro_signals.html").read_text(encoding="utf-8")
 
 _STATIC_MIME: dict[str, str] = {
     ".css": "text/css; charset=utf-8",
@@ -76,6 +77,24 @@ def route_pull_stats_page(start_response: Any) -> list[bytes]:
 def route_config_page(start_response: Any) -> list[bytes]:
     start_response("200 OK", [("Content-Type", "text/html; charset=utf-8")])
     return [_CONFIG_PAGE.encode("utf-8")]
+
+
+def route_macro_signals_page(start_response: Any) -> list[bytes]:
+    start_response("200 OK", [("Content-Type", "text/html; charset=utf-8")])
+    return [_MACRO_SIGNALS_PAGE.encode("utf-8")]
+
+
+def route_api_macro_summary(query: dict[str, list[str]], start_response: Any) -> list[bytes]:
+    try:
+        config = load_config()
+        report_date = query.get("date", [None])[0]
+        connect_kwargs = build_connection_kwargs(config)
+        with psycopg2.connect(**connect_kwargs) as conn:
+            payload = fetch_macro_summary(conn, report_date)
+        start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
+        return [json.dumps(payload).encode("utf-8")]
+    except Exception as exc:
+        return json_error(start_response, "500 Internal Server Error", str(exc))
 
 
 def route_pull_stats_stream(query: dict[str, list[str]], start_response: Any) -> Iterable[bytes]:
