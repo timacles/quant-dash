@@ -27,33 +27,35 @@ WITH base AS (
         f.close_vs_sma_50,
         f.close_vs_sma_200,
         f.volume_ratio_5_20,
-        f.avg_dollar_volume_20
+        f.avg_dollar_volume_20,
+        f.trend_persistence_10,
+        f.downtrend_persistence_10
     FROM public.vw_etf_daily_features f
 ),
 grouped AS (
-    SELECT date, symbol, display_name, 'asset_class'::text AS cluster_kind, asset_class AS cluster_value, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE asset_class IS NOT NULL
+    SELECT date, symbol, display_name, 'asset_class'::text AS cluster_kind, asset_class AS cluster_value, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE asset_class IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'theme_type', theme_type, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE theme_type IS NOT NULL
+    SELECT date, symbol, display_name, 'theme_type', theme_type, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE theme_type IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'sector', sector, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE sector IS NOT NULL
+    SELECT date, symbol, display_name, 'sector', sector, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE sector IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'industry', industry, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE industry IS NOT NULL
+    SELECT date, symbol, display_name, 'industry', industry, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE industry IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'region', region, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE region IS NOT NULL
+    SELECT date, symbol, display_name, 'region', region, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE region IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'country', country, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE country IS NOT NULL
+    SELECT date, symbol, display_name, 'country', country, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE country IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'style', style, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE style IS NOT NULL
+    SELECT date, symbol, display_name, 'style', style, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE style IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'commodity_group', commodity_group, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE commodity_group IS NOT NULL
+    SELECT date, symbol, display_name, 'commodity_group', commodity_group, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE commodity_group IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'duration_bucket', duration_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE duration_bucket IS NOT NULL
+    SELECT date, symbol, display_name, 'duration_bucket', duration_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE duration_bucket IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'credit_bucket', credit_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE credit_bucket IS NOT NULL
+    SELECT date, symbol, display_name, 'credit_bucket', credit_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE credit_bucket IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'risk_bucket', risk_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE risk_bucket IS NOT NULL
+    SELECT date, symbol, display_name, 'risk_bucket', risk_bucket, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE risk_bucket IS NOT NULL
     UNION ALL
-    SELECT date, symbol, display_name, 'benchmark_group', benchmark_group, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference FROM base WHERE benchmark_group IS NOT NULL
+    SELECT date, symbol, display_name, 'benchmark_group', benchmark_group, ret_5d, ret_10d, ret_20d, ret_60d, rs_5, rs_20, close_vs_sma_20, close_vs_sma_50, close_vs_sma_200, volume_ratio_5_20, avg_dollar_volume_20, is_macro_reference, trend_persistence_10, downtrend_persistence_10 FROM base WHERE benchmark_group IS NOT NULL
 ),
 aggregated AS (
     SELECT
@@ -75,12 +77,32 @@ aggregated AS (
         avg(CASE WHEN g.close_vs_sma_50 > 0 THEN 1.0 ELSE 0.0 END) AS pct_above_sma50,
         avg(CASE WHEN g.close_vs_sma_200 > 0 THEN 1.0 ELSE 0.0 END) AS pct_above_sma200,
         avg(g.volume_ratio_5_20) AS avg_volume_ratio_5_20,
-        avg(g.avg_dollar_volume_20) AS avg_dollar_volume_20
+        avg(g.avg_dollar_volume_20) AS avg_dollar_volume_20,
+        avg(g.trend_persistence_10) AS avg_trend_persistence_10,
+        avg(g.downtrend_persistence_10) AS avg_downtrend_persistence_10
     FROM grouped g
     GROUP BY g.date, g.cluster_kind, g.cluster_value
 )
 SELECT
-    a.*,
+    a.date,
+    a.cluster_kind,
+    a.cluster_value,
+    a.etf_count,
+    a.macro_reference_count,
+    a.avg_ret_5d,
+    a.avg_ret_10d,
+    a.avg_ret_20d,
+    a.avg_ret_60d,
+    a.avg_rs_5,
+    a.avg_rs_20,
+    a.avg_accel_5d_vs_20d,
+    a.avg_relative_accel_5d_vs_20d,
+    a.pct_positive_ret_20d,
+    a.pct_above_sma20,
+    a.pct_above_sma50,
+    a.pct_above_sma200,
+    a.avg_volume_ratio_5_20,
+    a.avg_dollar_volume_20,
     rank() OVER (
         PARTITION BY a.date, a.cluster_kind
         ORDER BY a.avg_ret_20d DESC NULLS LAST, a.avg_rs_20 DESC NULLS LAST, a.cluster_value
@@ -92,7 +114,18 @@ SELECT
     rank() OVER (
         PARTITION BY a.date, a.cluster_kind
         ORDER BY a.pct_above_sma50 DESC NULLS LAST, a.pct_positive_ret_20d DESC NULLS LAST, a.cluster_value
-    ) AS breadth_rank_in_kind
+    ) AS breadth_rank_in_kind,
+    a.avg_trend_persistence_10,
+    a.avg_downtrend_persistence_10,
+    rank() OVER (
+        PARTITION BY a.date, a.cluster_kind
+        ORDER BY a.avg_trend_persistence_10 DESC NULLS LAST, a.cluster_value
+    ) AS trend_quality_rank_in_kind,
+    CASE
+        WHEN a.avg_ret_20d > 0 AND a.avg_trend_persistence_10 < 0.5
+        THEN true
+        ELSE false
+    END AS fragile_momentum_flag
 FROM aggregated a;
 
 
@@ -291,6 +324,10 @@ WITH ratio_pairs AS (
     SELECT 'SPHB/SPLV', 'SPHB', 'SPLV', 'high_beta_vs_low_vol', 'High beta vs low volatility'
     UNION ALL
     SELECT 'XLI/XLU', 'XLI', 'XLU', 'industrial_vs_utility', 'Industrials vs utilities (ISM proxy)'
+    UNION ALL
+    SELECT 'UUP/SPY', 'UUP', 'SPY', 'dollar_regime', 'Dollar strength vs broad market risk'
+    UNION ALL
+    SELECT 'EEM/UUP', 'EEM', 'UUP', 'dollar_em_pressure', 'EM vs dollar — local-currency stress gauge'
 ),
 joined AS (
     SELECT
@@ -417,7 +454,28 @@ FROM enriched e;
 
 
 CREATE OR REPLACE VIEW public.vw_macro_signal_dashboard AS
-WITH ratios AS (
+WITH vol_signals AS (
+    SELECT
+        f.date,
+        f.close_vs_sma_50  AS vixy_close_vs_sma50,
+        f.close_vs_sma_200 AS vixy_close_vs_sma200,
+        f.close             AS vixy_close,
+        f.ret_5d            AS vixy_ret_5d
+    FROM public.vw_etf_daily_features f
+    WHERE f.symbol = 'VIXY'
+),
+vixy_vixm AS (
+    SELECT
+        r.date,
+        r.ratio_ret_5d      AS vixy_vixm_ratio_ret_5d,
+        r.ratio_ret_20d     AS vixy_vixm_ratio_ret_20d,
+        r.ratio_vs_sma_20   AS vixy_vixm_vs_sma20,
+        r.bullish_flag      AS vixy_vixm_bullish,
+        r.bearish_flag      AS vixy_vixm_bearish
+    FROM public.vw_macro_ratio_signals r
+    WHERE r.ratio_name = 'VIXY/VIXM'
+),
+ratios AS (
     SELECT
         r.date,
         max(CASE WHEN r.ratio_name = 'IWM/SPY' THEN r.ratio_ret_20d END) AS iwm_spy_ratio_ret_20d,
@@ -425,6 +483,8 @@ WITH ratios AS (
         max(CASE WHEN r.ratio_name = 'HYG/LQD' THEN r.ratio_ret_20d END) AS hyg_lqd_ratio_ret_20d,
         max(CASE WHEN r.ratio_name = 'DBC/SPY' THEN r.ratio_ret_20d END) AS dbc_spy_ratio_ret_20d,
         max(CASE WHEN r.ratio_name = 'TLT/IEF' THEN r.ratio_ret_20d END) AS tlt_ief_ratio_ret_20d,
+        max(CASE WHEN r.ratio_name = 'SMH/SPY' THEN r.ratio_ret_20d END) AS smh_spy_ratio_ret_20d,
+        max(CASE WHEN r.ratio_name = 'RSP/SPY' THEN r.ratio_ret_20d END) AS rsp_spy_ratio_ret_20d,
         max(CASE WHEN r.ratio_name = 'IWM/SPY' THEN r.spread_ret_20d_smooth_20 END) AS iwm_spy_spread_smooth_20,
         max(CASE WHEN r.ratio_name = 'QQQ/SPY' THEN r.spread_ret_20d_smooth_20 END) AS qqq_spy_spread_smooth_20,
         max(CASE WHEN r.ratio_name = 'HYG/LQD' THEN r.spread_ret_20d_smooth_20 END) AS hyg_lqd_spread_smooth_20,
@@ -432,7 +492,9 @@ WITH ratios AS (
         bool_or(CASE WHEN r.ratio_name = 'IWM/SPY' THEN r.bullish_flag END) AS iwm_spy_bullish,
         bool_or(CASE WHEN r.ratio_name = 'QQQ/SPY' THEN r.bullish_flag END) AS qqq_spy_bullish,
         bool_or(CASE WHEN r.ratio_name = 'HYG/LQD' THEN r.bullish_flag END) AS hyg_lqd_bullish,
-        bool_or(CASE WHEN r.ratio_name = 'DBC/SPY' THEN r.bullish_flag END) AS dbc_spy_bullish
+        bool_or(CASE WHEN r.ratio_name = 'DBC/SPY' THEN r.bullish_flag END) AS dbc_spy_bullish,
+        bool_or(CASE WHEN r.ratio_name = 'SMH/SPY' THEN r.bullish_flag END) AS smh_spy_bullish,
+        bool_or(CASE WHEN r.ratio_name = 'RSP/SPY' THEN r.bullish_flag END) AS rsp_spy_bullish
     FROM public.vw_macro_ratio_signals r
     GROUP BY r.date
 ),
@@ -445,53 +507,157 @@ cluster_strength AS (
         max(CASE WHEN c.cluster_kind = 'asset_class' AND c.cluster_value IN ('commodity', 'commodities') THEN c.avg_ret_20d END) AS commodity_cluster_ret_20d
     FROM public.vw_macro_cluster_momentum c
     GROUP BY c.date
+),
+dollar_signals AS (
+    SELECT
+        r.date,
+        max(CASE WHEN r.ratio_name = 'UUP/SPY' THEN r.ratio_ret_20d END) AS uup_spy_ratio_ret_20d,
+        max(CASE WHEN r.ratio_name = 'UUP/SPY' THEN r.spread_ret_20d_smooth_20 END) AS uup_spy_spread_smooth_20,
+        bool_or(CASE WHEN r.ratio_name = 'UUP/SPY' THEN r.bullish_flag END) AS uup_spy_bullish,
+        max(CASE WHEN r.ratio_name = 'EEM/UUP' THEN r.ratio_ret_20d END) AS eem_uup_ratio_ret_20d,
+        bool_or(CASE WHEN r.ratio_name = 'EEM/UUP' THEN r.bullish_flag END) AS eem_uup_bullish,
+        CASE
+            WHEN bool_or(CASE WHEN r.ratio_name = 'UUP/SPY' THEN r.bullish_flag END)
+             AND max(CASE WHEN r.ratio_name = 'UUP/SPY' THEN r.ratio_ret_20d END) > 0
+            THEN true
+            ELSE false
+        END AS dollar_headwind_flag
+    FROM public.vw_macro_ratio_signals r
+    GROUP BY r.date
+),
+dashboard_data AS (
+    SELECT
+        r.date,
+        r.iwm_spy_ratio_ret_20d,
+        r.qqq_spy_ratio_ret_20d,
+        r.hyg_lqd_ratio_ret_20d,
+        r.dbc_spy_ratio_ret_20d,
+        r.tlt_ief_ratio_ret_20d,
+        r.iwm_spy_spread_smooth_20,
+        r.qqq_spy_spread_smooth_20,
+        r.hyg_lqd_spread_smooth_20,
+        r.dbc_spy_spread_smooth_20,
+        r.iwm_spy_bullish,
+        r.qqq_spy_bullish,
+        r.hyg_lqd_bullish,
+        r.dbc_spy_bullish,
+        b.credit_spread_proxy_20d,
+        b.duration_spread_proxy_20d,
+        b.tips_vs_intermediate_treasury_20d,
+        b.credit_risk_on_flag,
+        b.duration_bid_flag,
+        b.inflation_bid_flag,
+        c.offensive_cluster_ret_20d,
+        c.defensive_cluster_ret_20d,
+        c.bond_cluster_ret_20d,
+        c.commodity_cluster_ret_20d,
+        CASE
+            WHEN coalesce(v.vixy_close_vs_sma200, 0) > 0.30
+              OR coalesce(vv.vixy_vixm_bearish, false)
+            THEN 'vol_crisis'
+            WHEN coalesce(v.vixy_close_vs_sma50, 0) > 0.10
+            THEN 'elevated_vol'
+            WHEN coalesce(r.iwm_spy_bullish, false)
+             AND coalesce(r.qqq_spy_bullish, false)
+             AND coalesce(r.hyg_lqd_bullish, false)
+             AND coalesce(b.credit_risk_on_flag, false)
+            THEN
+                CASE WHEN coalesce(d.dollar_headwind_flag, false)
+                     THEN 'risk_on_dollar_warning'
+                     ELSE 'risk_on'
+                END
+            WHEN coalesce(b.duration_bid_flag, false)
+             AND NOT coalesce(r.hyg_lqd_bullish, false)
+             AND coalesce(c.defensive_cluster_ret_20d, -1) >= coalesce(c.offensive_cluster_ret_20d, -1)
+            THEN 'risk_off'
+            WHEN coalesce(r.dbc_spy_bullish, false)
+             OR coalesce(b.inflation_bid_flag, false)
+             OR coalesce(c.commodity_cluster_ret_20d, 0) > coalesce(c.bond_cluster_ret_20d, 0)
+            THEN 'inflationary'
+            WHEN coalesce(b.duration_bid_flag, false)
+             AND coalesce(r.tlt_ief_ratio_ret_20d, 0) > 0
+            THEN 'liquidity_supportive'
+            ELSE 'mixed'
+        END AS macro_regime,
+        r.smh_spy_ratio_ret_20d,
+        r.rsp_spy_ratio_ret_20d,
+        r.smh_spy_bullish,
+        r.rsp_spy_bullish,
+        v.vixy_close_vs_sma50,
+        v.vixy_close_vs_sma200,
+        v.vixy_ret_5d,
+        vv.vixy_vixm_ratio_ret_5d,
+        vv.vixy_vixm_ratio_ret_20d,
+        vv.vixy_vixm_vs_sma20,
+        vv.vixy_vixm_bullish,
+        vv.vixy_vixm_bearish,
+        d.uup_spy_ratio_ret_20d,
+        d.uup_spy_spread_smooth_20,
+        d.uup_spy_bullish,
+        d.eem_uup_ratio_ret_20d,
+        d.eem_uup_bullish,
+        d.dollar_headwind_flag,
+        CASE
+            WHEN coalesce(d.uup_spy_bullish, false) AND NOT coalesce(d.eem_uup_bullish, false)
+            THEN 'strong_dollar_headwind'
+            WHEN NOT coalesce(d.uup_spy_bullish, false) AND coalesce(d.eem_uup_bullish, false)
+            THEN 'weak_dollar_tailwind'
+            ELSE 'dollar_neutral'
+        END AS dollar_regime,
+        (
+            CASE WHEN coalesce(r.iwm_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(r.qqq_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(r.hyg_lqd_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(r.smh_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(r.rsp_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(b.credit_risk_on_flag, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(d.eem_uup_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(c.offensive_cluster_ret_20d, -1) > coalesce(c.defensive_cluster_ret_20d, -1) THEN 1 ELSE 0 END
+        ) AS risk_on_signal_count,
+        (
+            CASE WHEN coalesce(b.duration_bid_flag, false) THEN 1 ELSE 0 END +
+            CASE WHEN NOT coalesce(r.hyg_lqd_bullish, true) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(d.uup_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(c.defensive_cluster_ret_20d, -1) >= coalesce(c.offensive_cluster_ret_20d, -1) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(c.bond_cluster_ret_20d, 0) > coalesce(c.commodity_cluster_ret_20d, 0) THEN 1 ELSE 0 END
+        ) AS risk_off_signal_count,
+        (
+            CASE WHEN coalesce(r.dbc_spy_bullish, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(b.inflation_bid_flag, false) THEN 1 ELSE 0 END +
+            CASE WHEN coalesce(c.commodity_cluster_ret_20d, 0) > coalesce(c.bond_cluster_ret_20d, 0) THEN 1 ELSE 0 END
+        ) AS inflation_signal_count
+    FROM ratios r
+    LEFT JOIN public.vw_macro_bond_treasury_summary b ON b.date = r.date
+    LEFT JOIN cluster_strength c ON c.date = r.date
+    LEFT JOIN vol_signals v ON v.date = r.date
+    LEFT JOIN vixy_vixm vv ON vv.date = r.date
+    LEFT JOIN dollar_signals d ON d.date = r.date
+),
+regime_lagged AS (
+    SELECT
+        *,
+        lag(macro_regime) OVER (ORDER BY date) AS prev_regime
+    FROM dashboard_data
+),
+regime_with_groups AS (
+    SELECT
+        *,
+        sum(CASE WHEN macro_regime IS DISTINCT FROM prev_regime THEN 1 ELSE 0 END)
+            OVER (ORDER BY date ROWS UNBOUNDED PRECEDING) AS regime_group
+    FROM regime_lagged
 )
 SELECT
-    r.date,
-    r.iwm_spy_ratio_ret_20d,
-    r.qqq_spy_ratio_ret_20d,
-    r.hyg_lqd_ratio_ret_20d,
-    r.dbc_spy_ratio_ret_20d,
-    r.tlt_ief_ratio_ret_20d,
-    r.iwm_spy_spread_smooth_20,
-    r.qqq_spy_spread_smooth_20,
-    r.hyg_lqd_spread_smooth_20,
-    r.dbc_spy_spread_smooth_20,
-    r.iwm_spy_bullish,
-    r.qqq_spy_bullish,
-    r.hyg_lqd_bullish,
-    r.dbc_spy_bullish,
-    b.credit_spread_proxy_20d,
-    b.duration_spread_proxy_20d,
-    b.tips_vs_intermediate_treasury_20d,
-    b.credit_risk_on_flag,
-    b.duration_bid_flag,
-    b.inflation_bid_flag,
-    c.offensive_cluster_ret_20d,
-    c.defensive_cluster_ret_20d,
-    c.bond_cluster_ret_20d,
-    c.commodity_cluster_ret_20d,
+    *,
+    row_number() OVER (PARTITION BY regime_group ORDER BY date) AS regime_days,
     CASE
-        WHEN coalesce(r.iwm_spy_bullish, false)
-         AND coalesce(r.qqq_spy_bullish, false)
-         AND coalesce(r.hyg_lqd_bullish, false)
-         AND coalesce(b.credit_risk_on_flag, false)
-        THEN 'risk_on'
-        WHEN coalesce(b.duration_bid_flag, false)
-         AND NOT coalesce(r.hyg_lqd_bullish, false)
-         AND coalesce(c.defensive_cluster_ret_20d, -1) >= coalesce(c.offensive_cluster_ret_20d, -1)
-        THEN 'risk_off'
-        WHEN coalesce(r.dbc_spy_bullish, false)
-         OR coalesce(b.inflation_bid_flag, false)
-         OR coalesce(c.commodity_cluster_ret_20d, 0) > coalesce(c.bond_cluster_ret_20d, 0)
-        THEN 'inflationary'
-        WHEN coalesce(b.duration_bid_flag, false)
-         AND coalesce(r.tlt_ief_ratio_ret_20d, 0) > 0
-        THEN 'liquidity_supportive'
-        ELSE 'mixed'
-    END AS macro_regime
-FROM ratios r
-LEFT JOIN public.vw_macro_bond_treasury_summary b
-    ON b.date = r.date
-LEFT JOIN cluster_strength c
-    ON c.date = r.date;
+        WHEN macro_regime IN ('risk_on', 'risk_on_dollar_warning') THEN
+            LEAST(risk_on_signal_count::double precision / 8.0, 1.0)
+        WHEN macro_regime = 'risk_off' THEN
+            LEAST(risk_off_signal_count::double precision / 5.0, 1.0)
+        WHEN macro_regime = 'inflationary' THEN
+            inflation_signal_count::double precision / 3.0
+        WHEN macro_regime IN ('vol_crisis', 'elevated_vol') THEN 1.0
+        WHEN macro_regime = 'liquidity_supportive' THEN 0.5
+        ELSE 0.0
+    END AS regime_conviction
+FROM regime_with_groups;

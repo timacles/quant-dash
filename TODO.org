@@ -1,15 +1,21 @@
 #+TITLE: Quant Dash 
 
 * Main 
-** Spec Strategy
-- each implementation path should have its own instructions/plan file
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
 *** theme SQL view 
+** Design
+ - Status bar on top:
+   - date
+   - data inconsisntecies
+ - navigation
 ** Split Sections Out 
 - add a section loader or just move them to separate pages
 - move the Macro section to the bottom;
+
+** add data inconsitency alert to page
+
 * Later
 ** industry leader stocks
 - scrape from finviz
