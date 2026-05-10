@@ -13,8 +13,23 @@
 ** Split Sections Out 
 - add a section loader or just move them to separate pages
 - move the Macro section to the bottom;
-
+  
 ** add data inconsitency alert to page
+- make the script return a flag if any critical inconsistencies are found
+
+** Design
+- add a status bar with
+  - current time,
+  - latest data date
+  - data inconsistency indicator (
+
+** JSON export 4 analysis
+ - LLM analysis
+ - start with Macro table
+ - the specific signals table
+
+** Theme Dashboard
+- leaders/laggards by theme
 
 * Later
 ** industry leader stocks

@@ -80,81 +80,7 @@ function renderCell(column, row) {
   return `<td class="${classes}" data-sort-value="${escapeHtml(sortValue(column, row[column]))}">${escapeHtml(formatValue(column, row[column]))}</td>`;
 }
 
-function renderSummaryLoading(message) {
-  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
-}
 
-function renderSummaryCard(summary) {
-  if (!summary || !Array.isArray(summary.rows) || !summary.rows.length) {
-    const msg = summary && summary.error
-      ? `Error: ${summary.error}`
-      : "No macro signal data found for the selected date.";
-    return renderSummaryLoading(msg);
-  }
-
-  const rows = summary.rows;
-  const asOfDate = summary.date || rows[0].date || "—";
-
-  const columns = [
-    { key: "signal_name", label: "Signal" },
-    { key: "source", label: "Source" },
-    { key: "chg_1d", label: "1D" },
-    { key: "chg_5d", label: "5D" },
-    { key: "chg_10d", label: "10D" },
-    { key: "chg_20d", label: "20D" },
-    { key: "vs_dma_20", label: "vs 20" },
-    { key: "vs_dma_50", label: "vs 50" },
-    { key: "vs_dma_200", label: "vs 200" },
-    { key: "wk_rvol", label: "RVol" },
-    { key: "interpretation", label: "Interpretation" },
-  ];
-
-  const groups = [];
-  const groupMap = {};
-  for (const row of rows) {
-    const cat = row.category || "Other";
-    if (!groupMap[cat]) {
-      groupMap[cat] = [];
-      groups.push(cat);
-    }
-    groupMap[cat].push(row);
-  }
-
-  const headerHtml = columns
-    .map((col) => `<th>${escapeHtml(col.label)}</th>`)
-    .join("");
-
-  let bodyHtml = "";
-  for (const cat of groups) {
-    const catRows = groupMap[cat];
-    bodyHtml += `<tr class="etf-report__macro-group-row"><td colspan="${columns.length}">${escapeHtml(cat)}</td></tr>`;
-    for (const row of catRows) {
-      bodyHtml += "<tr>";
-      for (const col of columns) {
-        const value = row[col.key];
-        if (col.key === "interpretation") {
-          bodyHtml += `<td class="etf-report__macro-interp">${escapeHtml(value == null ? "—" : String(value))}</td>`;
-        } else if (col.key === "signal_name") {
-          bodyHtml += `<td class="etf-report__macro-signal">${escapeHtml(value == null ? "—" : String(value))}</td>`;
-        } else if (col.key === "source") {
-          bodyHtml += `<td class="etf-report__macro-source">${escapeHtml(value == null ? "—" : String(value))}</td>`;
-        } else if (["chg_1d", "chg_5d", "chg_10d", "chg_20d", "vs_dma_20", "vs_dma_50", "vs_dma_200"].includes(col.key)) {
-          const cls = valueClass("ret_5d", value);
-          const formatted = value == null ? "—" : `${(Number(value) * 100).toFixed(2)}%`;
-          bodyHtml += `<td class="etf-report__value${cls}">${escapeHtml(formatted)}</td>`;
-        } else if (col.key === "wk_rvol") {
-          const formatted = value == null ? "—" : Number(value).toFixed(2);
-          bodyHtml += `<td>${escapeHtml(formatted)}</td>`;
-        } else {
-          bodyHtml += `<td>${escapeHtml(value == null ? "—" : String(value))}</td>`;
-        }
-      }
-      bodyHtml += "</tr>";
-    }
-  }
-
-  return `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ${escapeHtml(asOfDate)}</span><span class="etf-report__badge">${rows.length} signals</span></div></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
-}
 
 function sectionAnchorId(sectionKey) {
   return `section-${sectionKey}`;
@@ -254,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!container) return;
 
   const sections = JSON.parse(container.dataset.sections || "[]");
-  const summaryContainer = document.querySelector("[data-etf-summary]");
+
   const grid = document.querySelector("[data-etf-grid]");
   const form = document.querySelector("[data-etf-filter-form]");
   const input = form ? form.querySelector("input[name='date']") : null;
@@ -275,7 +201,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderLoadingState() {
-    // summaryContainer is left as-is (shows link to /macro-signals)
     if (!grid) return;
     grid.innerHTML = sections
       .map((section) => renderLoadingCard(section, "Loading data…", sectionLimits[section.key]))
@@ -283,7 +208,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderErrorState(message) {
-    // summaryContainer is left as-is (shows link to /macro-signals)
     if (!grid) return;
     grid.innerHTML = `<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Data unavailable</h2><p class="etf-report__card-desc">The report shell loaded, but the section data request failed.</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
     if (analysisContainer) {
@@ -340,7 +264,6 @@ async function loadSections(dateValue) {
       grid.innerHTML = sections
         .map((section) => renderSection(section, payload.sections[section.key] || [], sectionLimits[section.key] || DEFAULT_SECTION_LIMIT))
         .join("");
-      // summaryContainer is left as-is (shows link to /macro-signals)
       initTableSorters(grid);
       if (analysisContainer) {
         analysisContainer.innerHTML = renderAnalysisCard(payload.analysis || null);
