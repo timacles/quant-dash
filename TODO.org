@@ -1,6 +1,12 @@
 #+TITLE: Quant Dash 
 
 * Main 
+** JSON export 4 analysis
+ - [ ] create JSON view 
+ - [ ] instructions for reading?
+ - [ ] contract for LLM output
+** Remove Unusued SQL Views
+script in sql folder
 ** Theme View Card
    - [ ] leader/laggards
    - [ ] theme/industry/sector
@@ -22,11 +28,6 @@
   - current time,
   - latest data date
   - data inconsistency indicator (
-
-** JSON export 4 analysis
- - LLM analysis
- - start with Macro table
- - the specific signals table
 
 ** Theme Dashboard
 - leaders/laggards by theme
@@ -58,3 +59,4 @@ select pg_read_file('/etc/postgresql/17/main/macro_analysis_20260405_232651.json
 or top 3 get highlighted
 ** ETF metadata editor
 ** FRED API ?
+

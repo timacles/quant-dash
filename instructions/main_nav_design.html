@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Main Page Navigation — 3 Design Suggestions</title>
+  <style>
+    /* ---- Reset & base ---- */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 15px; }
+    body {
+      margin: 0;
+      background: #0c0c0c;
+      color: #d4d4d8;
+      font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+      line-height: 1.6;
+      padding: 32px;
+    }
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* ---- Headers ---- */
+    h1 {
+      font-size: 2rem;
+      color: #f0f0f5;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .subhead {
+      color: #90909a;
+      margin: 0 0 32px;
+      font-size: 0.95rem;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: #4ade80;
+      margin: 36px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(74, 222, 128, 0.2);
+      letter-spacing: -0.01em;
+    }
+    h3 {
+      font-size: 1.05rem;
+      color: #e4e4e7;
+      margin: 20px 0 8px;
+    }
+
+    /* ---- Cards ---- */
+    .suggestion {
+      background: #18181a;
+      border: 1px solid rgba(80,80,85,0.5);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+    .suggestion__header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .suggestion__letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: rgba(74,222,128,0.12);
+      border: 1px solid rgba(74,222,128,0.3);
+      color: #4ade80;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .suggestion__title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f0f0f5;
+      margin: 0;
+    }
+    .suggestion__desc {
+      color: #90909a;
+      margin: 4px 0 16px;
+      font-size: 0.92rem;
+    }
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .pros-cons > div {
+      padding: 12px 16px;
+      border-radius: 6px;
+      background: #121214;
+      border: 1px solid rgba(80,80,85,0.3);
+    }
+    .pros-cons h4 {
+      margin: 0 0 6px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+    .pros-cons h4.pro { color: #4ade80; }
+    .pros-cons h4.con { color: #ef4444; }
+    .pros-cons ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.88rem;
+      color: #d4d4d8;
+    }
+    .pros-cons li { margin-bottom: 3px; }
+
+    /* ---- Wireframe diagrams ---- */
+    .diagram {
+      margin: 16px 0;
+      border-radius: 6px;
+      background: #121214;
+      border: 1px solid rgba(80,80,85,0.3);
+      overflow: hidden;
+      font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .diagram pre {
+      margin: 0;
+      padding: 16px 18px;
+      overflow-x: auto;
+      white-space: pre;
+      color: #c4c4c8;
+    }
+    .diagram .hl { color: #4ade80; font-weight: 600; }
+    .diagram .hl2 { color: #60a5fa; font-weight: 600; }
+    .diagram .hl3 { color: #a78bfa; font-weight: 600; }
+    .diagram .dim { color: #60606a; }
+    .diagram .warn { color: #facc15; }
+
+    /* ---- Mock live demo panels ---- */
+    .demo {
+      margin: 16px 0;
+      border-radius: 6px;
+      background: #121214;
+      border: 1px solid rgba(80,80,85,0.3);
+      padding: 0;
+      overflow: hidden;
+    }
+    .demo__label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #60606a;
+      padding: 8px 14px 0;
+      font-weight: 700;
+    }
+
+    /* SUGGESTION A — Sticky Sidebar Demo */
+    .demo-a {
+      display: flex;
+      min-height: 320px;
+    }
+    .demo-a__sidebar {
+      width: 190px;
+      flex-shrink: 0;
+      background: #0e0e10;
+      border-right: 1px solid rgba(80,80,85,0.4);
+      padding: 14px 10px;
+    }
+    .demo-a__sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      color: #90909a;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      cursor: default;
+    }
+    .demo-a__sidebar-item:hover { background: rgba(74,222,128,0.06); }
+    .demo-a__sidebar-item.active {
+      background: rgba(74,222,128,0.1);
+      border-left: 2px solid #4ade80;
+      color: #4ade80;
+    }
+    .demo-a__sidebar-item.config {
+      margin-top: 14px;
+      border-top: 1px solid rgba(80,80,85,0.3);
+      padding-top: 12px;
+    }
+    .demo-a__content {
+      flex: 1;
+      padding: 16px 18px;
+    }
+    .demo-a__section {
+      border: 1px solid rgba(80,80,85,0.25);
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      background: #18181a;
+    }
+    .demo-a__section-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .demo-a__section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e4e4e7;
+    }
+    .demo-a__section-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: rgba(74,222,128,0.1);
+      color: #4ade80;
+      border: 1px solid rgba(74,222,128,0.2);
+    }
+    .demo-a__section-row {
+      display: grid;
+      grid-template-columns: 30px 50px 60px 60px 60px;
+      gap: 4px;
+      padding: 4px 0;
+      font-size: 11px;
+      color: #90909a;
+      border-bottom: 1px solid rgba(80,80,85,0.1);
+    }
+    .demo-a__section-row:last-child { border-bottom: none; }
+    .demo-a__section-row span:first-child { color: #60606a; }
+
+    /* SUGGESTION B — Accordion Groups Demo */
+    .demo-b {
+      padding: 16px 18px;
+    }
+    .demo-b__strip {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      background: #0e0e10;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(80,80,85,0.25);
+    }
+    .demo-b__pill {
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #90909a;
+      background: #18181a;
+      border: 1px solid rgba(80,80,85,0.2);
+      cursor: default;
+    }
+    .demo-b__pill.active {
+      background: rgba(74,222,128,0.1);
+      border-color: rgba(74,222,128,0.3);
+      color: #4ade80;
+    }
+    .demo-b__pill.config {
+      margin-left: auto;
+    }
+    .demo-b__group-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #60606a;
+      font-weight: 700;
+      padding: 10px 0 4px;
+    }
+    .demo-b__section {
+      border: 1px solid rgba(80,80,85,0.2);
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      background: #18181a;
+    }
+    .demo-b__section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e4e4e7;
+      margin-bottom: 4px;
+    }
+    .demo-b__section-desc {
+      font-size: 11px;
+      color: #60606a;
+    }
+
+    /* SUGGESTION C — Dropdown Switcher Demo */
+    .demo-c {
+      padding: 16px 18px;
+    }
+    .demo-c__bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .demo-c__select {
+      background: #18181a;
+      border: 1px solid rgba(80,80,85,0.4);
+      border-radius: 4px;
+      color: #d4d4d8;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      min-width: 200px;
+    }
+    .demo-c__gear {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(80,80,85,0.3);
+      border-radius: 4px;
+      background: #18181a;
+      color: #90909a;
+      cursor: default;
+    }
+    .demo-c__table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .demo-c__table th {
+      text-align: right;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(80,80,85,0.3);
+      color: #60606a;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      background: #0e0e10;
+    }
+    .demo-c__table th:first-child,
+    .demo-c__table td:first-child { text-align: left; }
+    .demo-c__table th:nth-child(2),
+    .demo-c__table td:nth-child(2) { text-align: left; }
+    .demo-c__table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(80,80,85,0.1);
+      text-align: right;
+    }
+    .demo-c__table .pos { color: #4ade80; font-weight: 600; }
+    .demo-c__table .neg { color: #ef4444; font-weight: 600; }
+    .demo-c__table .sym { color: #60a5fa; font-weight: 700; }
+
+    /* Config panel mock (inline for C) */
+    .demo-c__config-panel {
+      display: none;
+      margin-top: 12px;
+      border: 1px solid rgba(96,165,250,0.3);
+      border-radius: 4px;
+      background: #0e0e10;
+      padding: 14px;
+    }
+    .demo-c__config-panel.visible { display: block; }
+    .demo-c__config-panel h4 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #60a5fa;
+    }
+    .demo-c__config-col {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      margin: 3px;
+      border-radius: 3px;
+      background: #18181a;
+      border: 1px solid rgba(80,80,85,0.2);
+      font-size: 11px;
+    }
+    .demo-c__config-col input { accent-color: #4ade80; }
+
+    /* ---- Comparison table ---- */
+    .comparison {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+    .comparison th, .comparison td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(80,80,85,0.3);
+      text-align: left;
+    }
+    .comparison th {
+      background: #18181a;
+      color: #90909a;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    .comparison th:first-child { text-align: left; }
+    .comparison td { text-align: center; }
+    .comparison td:first-child { text-align: left; color: #e4e4e7; font-weight: 600; }
+    .check { color: #4ade80; }
+    .cross { color: #ef4444; }
+    .warn2 { color: #facc15; }
+    .effort-high { color: #ef4444; }
+    .effort-med { color: #facc15; }
+
+    /* ---- Recommendation box ---- */
+    .rec {
+      margin: 28px 0 0;
+      padding: 18px 22px;
+      border-radius: 8px;
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.25);
+    }
+    .rec h3 {
+      color: #4ade80;
+      margin: 0 0 6px;
+    }
+    .rec p { margin: 0; color: #c4c4c8; }
+
+    /* ---- TOC ---- */
+    .toc { margin: 20px 0 28px; }
+    .toc a {
+      display: inline-block;
+      margin-right: 16px;
+      color: #60a5fa;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ---- Footer ---- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(80,80,85,0.3);
+      font-size: 12px;
+      color: #60606a;
+    }
+
+    /* ---- Badges ---- */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .badge--a { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+    .badge--b { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+    .badge--c { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.2); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<h1>Main Page Navigation &mdash; 3 Design Suggestions</h1>
+<p class="subhead">
+  How to organise the main dashboard page, its 5 data sections, and the config / utility pages.
+  Each suggestion includes a rendered diagram and a live mockup.
+</p>
+
+<div class="toc">
+  <a href="#suggestion-a">A &middot; Sticky Sidebar</a>
+  <a href="#suggestion-b">B &middot; Accordion Groups</a>
+  <a href="#suggestion-c">C &middot; Dropdown Switcher</a>
+  <a href="#comparison">Comparison</a>
+  <a href="#recommendation">Recommendation</a>
+</div>
+
+<!-- ============================================================ -->
+<!--  SUGGESTION A                                                 -->
+<!-- ============================================================ -->
+<section class="suggestion" id="suggestion-a">
+  <div class="suggestion__header">
+    <span class="suggestion__letter">A</span>
+    <h2 class="suggestion__title">Sticky Sidebar with Section Tabs</h2>
+    <span class="badge badge--a">sidebar &middot; two-column</span>
+  </div>
+  <p class="suggestion__desc">
+    Replace the single-column layout with two columns: a narrow sidebar that sticks on scroll,
+    and the main content area on the right. Every section + config gets a row in the sidebar.
+  </p>
+
+  <h3>Diagram</h3>
+  <div class="diagram">
+<pre>┌───────────────────────────────────────────────────────────────┐
+│  <span class="hl">Operations:</span>  [Pull Stats] [Macro Signals] <span class="dim">← stays in bar</span>│
+├────────┬──────────────────────────────────────────────────────┤
+│ <span class="hl">NAV</span>    │  <span class="hl2">Hero / date picker</span>                              │
+│ <span class="dim">sticky</span>  │                                                      │
+│        │  ┌─ Momentum Longs ──────────────────────────────┐  │
+│ <span class="hl">📈 Mom.</span>│  │  <span class="dim">#   Symbol   Ret_1d  RVol_20  Score</span>              │  │
+│ <span class="hl">Long</span>   │  │  1   QLD     +2.30   1.45    78.5                 │  │
+│        │  │  2   TQQQ    +1.80   0.92    72.1                 │  │
+│ <span class="hl">📉 Mom.</span>│  └──────────────────────────────────────────────────┘  │
+│ <span class="hl">Short</span>  │  ┌─ Momentum Shorts ─────────────────────────────┐  │
+│        │  │  <span class="dim">#   Symbol   Ret_1d  RVol_20  Score</span>              │  │
+│ <span class="hl">🔄 Rev.</span>│  │  1   SQQQ    −2.10   1.62    24.3                 │  │
+│ <span class="hl">Long</span>   │  └──────────────────────────────────────────────────┘  │
+│        │  ┌─ Range Compression ───────────────────────────┐  │
+│ <span class="hl">🔁 Rev.</span>│  │  <span class="dim">#   Symbol   Compression   Score</span>                    │  │
+│ <span class="hl">Short</span>  │  │  1   TLT      0.082        65.2                    │  │
+│        │  └──────────────────────────────────────────────────┘  │
+│ <span class="hl">📊 Range</span>│                                                      │
+│        │  <span class="hl2">Analysis card</span>                                    │
+│ <span class="hl">⚙️ Config</span>│                                                      │
+├────────┴──────────────────────────────────────────────────────┤
+│  <span class="dim">Environment: dev  ·  DB: financials_dev</span>                    │
+└───────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <h3>Live Mockup</h3>
+  <div class="demo">
+    <div class="demo__label">Sticky Sidebar &middot; concept</div>
+    <div class="demo-a">
+      <div class="demo-a__sidebar">
+        <div class="demo-a__sidebar-item active">📈 Mom. Long</div>
+        <div class="demo-a__sidebar-item">📉 Mom. Short</div>
+        <div class="demo-a__sidebar-item">🔄 Rev. Long</div>
+        <div class="demo-a__sidebar-item">🔁 Rev. Short</div>
+        <div class="demo-a__sidebar-item">📊 Range Comp.</div>
+        <div class="demo-a__sidebar-item config">⚙️ Config</div>
+      </div>
+      <div class="demo-a__content">
+        <div class="demo-a__section">
+          <div class="demo-a__section-hdr">
+            <span class="demo-a__section-title">Momentum Longs</span>
+            <span class="demo-a__section-badge">TOP N 10</span>
+          </div>
+          <div class="demo-a__section-row"><span>#</span><span>Symbol</span><span>Ret_1d</span><span>RVol_20</span><span>Score</span></div>
+          <div class="demo-a__section-row"><span>1</span><span style="color:#60a5fa;font-weight:700;">QLD</span><span style="color:#4ade80;">+2.30</span><span>1.45</span><span>78.5</span></div>
+          <div class="demo-a__section-row"><span>2</span><span style="color:#60a5fa;font-weight:700;">TQQQ</span><span style="color:#4ade80;">+1.80</span><span>0.92</span><span>72.1</span></div>
+          <div class="demo-a__section-row"><span>3</span><span style="color:#60a5fa;font-weight:700;">FAS</span><span style="color:#4ade80;">+1.25</span><span>0.88</span><span>68.3</span></div>
+        </div>
+        <div class="demo-a__section">
+          <div class="demo-a__section-hdr">
+            <span class="demo-a__section-title">Momentum Shorts</span>
+            <span class="demo-a__section-badge">TOP N 5</span>
+          </div>
+          <div class="demo-a__section-row"><span>#</span><span>Symbol</span><span>Ret_1d</span><span>RVol_20</span><span>Score</span></div>
+          <div class="demo-a__section-row"><span>1</span><span style="color:#60a5fa;font-weight:700;">SQQQ</span><span style="color:#ef4444;">−2.10</span><span>1.62</span><span>24.3</span></div>
+          <div class="demo-a__section-row"><span>2</span><span style="color:#60a5fa;font-weight:700;">SPXS</span><span style="color:#ef4444;">−1.85</span><span>1.30</span><span>28.7</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div>
+      <h4 class="pro">Pros</h4>
+      <ul>
+        <li>Always-visible orientation — all sections at a glance</li>
+        <li>No content reflow from the existing card grid</li>
+        <li>Natural place for config link alongside data sections</li>
+        <li>Familiar dashboard pattern (Grafana, Retool)</li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="con">Cons</h4>
+      <ul>
+        <li>Reduces horizontal space for tables by ~200px</li>
+        <li>Requires layout refactor (HTML + CSS)</li>
+        <li>Sidebar gets long with 10+ sections</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!--  SUGGESTION B                                                 -->
+<!-- ============================================================ -->
+<section class="suggestion" id="suggestion-b">
+  <div class="suggestion__header">
+    <span class="suggestion__letter">B</span>
+    <h2 class="suggestion__title">Accordion Section Groups with Sticky Strip</h2>
+    <span class="badge badge--b">groups &middot; sticky strip &middot; single-column</span>
+  </div>
+  <p class="suggestion__desc">
+    Keep the single-column layout but group related sections under conceptual headers
+    (<em>Momentum</em>, <em>Reversion</em>, <em>Compression</em>). A sticky pill strip below
+    the hero lets users jump between groups. Config gets its own pill in the strip.
+  </p>
+
+  <h3>Diagram</h3>
+  <div class="diagram">
+<pre>┌───────────────────────────────────────────────────────────────┐
+│  <span class="hl">Operations:</span>  [Pull Stats] [Macro Signals]                │
+├───────────────────────────────────────────────────────────────┤
+│  <span class="hl2">Hero / date picker</span>                                    │
+├───────────────────────────────────────────────────────────────┤
+│  [<span class="hl">Momentum</span>] [Reversion] [Compression] [<span class="hl3">⚙️ Config</span>]  <span class="dim">← sticky</span>│
+├───────────────────────────────────────────────────────────────┤
+│  <span class="dim">┄┄ MOMENTUM ┄┄</span>                                           │
+│  ┌─ Momentum Longs ──────────────────────────────────────┐   │
+│  │  <span class="dim">#   Symbol   Ret_1d  RVol_20  Score</span>                  │   │
+│  │  1   QLD     +2.30   1.45    78.5                     │   │
+│  │  2   TQQQ    +1.80   0.92    72.1                     │   │
+│  └────────────────────────────────────────────────────────┘   │
+│  ┌─ Momentum Shorts ─────────────────────────────────────┐   │
+│  │  <span class="dim">#   Symbol   Ret_1d  RVol_20  Score</span>                  │   │
+│  │  1   SQQQ    −2.10   1.62    24.3                     │   │
+│  └────────────────────────────────────────────────────────┘   │
+│  <span class="dim">┄┄ REVERSION ┄┄</span>                                          │
+│  ┌─ Oversold Mean Reversion ────────────────────────────┐   │
+│  │  <span class="dim">#   Symbol   Location  Score</span>                         │   │
+│  │  1   TLT     0.082     65.2                          │   │
+│  └────────────────────────────────────────────────────────┘   │
+│  ┌─ Overbought Mean Reversion ──────────────────────────┐   │
+│  │  <span class="dim">#   Symbol   Location  Score</span>                         │   │
+│  │  1   SPY     0.912     34.8                          │   │
+│  └────────────────────────────────────────────────────────┘   │
+│  <span class="dim">┄┄ RANGE COMPRESSION ┄┄</span>                                  │
+│  ┌─ Range Compression ──────────────────────────────────┐   │
+│  │  <span class="dim">#   Symbol   Compression  Score</span>                       │   │
+│  │  1   EEM     0.042       71.2                        │   │
+│  └────────────────────────────────────────────────────────┘   │
+├───────────────────────────────────────────────────────────────┤
+│  <span class="hl2">Analysis card</span>                                           │
+└───────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <h3>Live Mockup</h3>
+  <div class="demo">
+    <div class="demo__label">Accordion Groups &middot; concept</div>
+    <div class="demo-b">
+      <div class="demo-b__strip">
+        <span class="demo-b__pill active">Momentum</span>
+        <span class="demo-b__pill">Reversion</span>
+        <span class="demo-b__pill">Compression</span>
+        <span class="demo-b__pill config">⚙️ Config</span>
+      </div>
+      <div class="demo-b__group-label">MOMENTUM</div>
+      <div class="demo-b__section">
+        <div class="demo-b__section-title">Momentum Longs</div>
+        <div class="demo-b__section-desc">Upside momentum leaders — TOP N 10</div>
+      </div>
+      <div class="demo-b__section">
+        <div class="demo-b__section-title">Momentum Shorts</div>
+        <div class="demo-b__section-desc">Downside momentum leaders — TOP N 5</div>
+      </div>
+      <div class="demo-b__group-label" style="margin-top:14px;">REVERSION</div>
+      <div class="demo-b__section">
+        <div class="demo-b__section-title">Oversold Mean Reversion</div>
+        <div class="demo-b__section-desc">Long-reversion candidates with downside stretch</div>
+      </div>
+      <div class="demo-b__section">
+        <div class="demo-b__section-title">Overbought Mean Reversion</div>
+        <div class="demo-b__section-desc">Short-reversion candidates with upside stretch</div>
+      </div>
+      <div class="demo-b__group-label" style="margin-top:14px;">RANGE COMPRESSION</div>
+      <div class="demo-b__section">
+        <div class="demo-b__section-title">Range Compression</div>
+        <div class="demo-b__section-desc">Tightening setups ranked by compression and accumulation</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div>
+      <h4 class="pro">Pros</h4>
+      <ul>
+        <li>Full-width tables — no sidebar stealing space</li>
+        <li>Works within existing single-column template</li>
+        <li>Reduces visual noise by grouping related sections</li>
+        <li>Config pill fits naturally in the strip</li>
+        <li>Scales well to 10+ sections</li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="con">Cons</h4>
+      <ul>
+        <li>Needs a <code>group</code> field in <code>SectionConfig</code></li>
+        <li>Requires scroll-into-view JS on pill click</li>
+        <li>Only 5 sections currently — grouping is lightly beneficial now</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!--  SUGGESTION C                                                 -->
+<!-- ============================================================ -->
+<section class="suggestion" id="suggestion-c">
+  <div class="suggestion__header">
+    <span class="suggestion__letter">C</span>
+    <h2 class="suggestion__title">Dropdown Section Switcher with Inline Config</h2>
+    <span class="badge badge--c">dropdown &middot; single-section &middot; slide-out config</span>
+  </div>
+  <p class="suggestion__desc">
+    Show one section at a time, selected via a dropdown selector. A gear icon opens an inline
+    config panel (slide-out or modal) so the user can reorder columns without leaving the page.
+    The config page becomes unnecessary.
+  </p>
+
+  <h3>Diagram</h3>
+  <div class="diagram">
+<pre>┌───────────────────────────────────────────────────────────────┐
+│  <span class="hl">Operations:</span>  [Pull Stats] [Macro Signals]                │
+├───────────────────────────────────────────────────────────────┤
+│  <span class="hl2">Hero / date picker</span>                                    │
+├───────────────────────────────────────────────────────────────┤
+│  Section: [<span class="hl">Momentum Longs ▼</span>]  [<span class="hl3">⚙️</span>]                      │
+├───────────────────────────────────────────────────────────────┤
+│  ┌─ Momentum Longs ───────────────────────────────────────┐  │
+│  │  <span class="dim">TOP N [10]</span>                                        │  │
+│  │                                                         │  │
+│  │  <span class="dim">#   Symbol  Ret_1d  Ret_5d  RVol_20  Score</span>           │  │
+│  │  1   QLD    +2.30   +5.12   1.45     78.5              │  │
+│  │  2   TQQQ   +1.80   +4.73   0.92     72.1              │  │
+│  │  3   FAS    +1.25   +3.88   0.88     68.3              │  │
+│  │  4   UPRO   +0.97   +3.14   0.76     65.0              │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                               │
+│  ┌─ Analysis ─────────────────────────────────────────────┐  │
+│  │  Market regime: bullish · 3 new highs · 2 new lows     │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                                                               │
+│  ┌─ <span class="hl3">⚙️ Configure Columns</span> ────────────────────────────┐  │
+│  │  <span class="dim">(slide-out from right / modal)</span>                    │  │
+│  │  ☑ Rank   ☑ Symbol   ☐ Display Name  ☑ Ret_1d           │  │
+│  │  ☑ Ret_5d ☐ Ret_10d  ☑ RVol_20       ☑ Score            │  │
+│  │  ☐ ZScore ☐ Location ☐ Compression                      │  │
+│  │  [<span class="warn">Save</span>]                                              │  │
+│  └─────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <h3>Live Mockup</h3>
+  <div class="demo">
+    <div class="demo__label">Dropdown Switcher + Inline Config &middot; concept</div>
+    <div class="demo-c">
+      <div class="demo-c__bar">
+        <select class="demo-c__select">
+          <option selected>Momentum Longs</option>
+          <option>Momentum Shorts</option>
+          <option>Oversold Mean Reversion</option>
+          <option>Overbought Mean Reversion</option>
+          <option>Range Compression</option>
+        </select>
+        <span class="demo-c__gear" onclick="toggleConfig()" style="cursor:pointer;">⚙️</span>
+        <span style="font-size:11px;color:#60606a;margin-left:8px;">TOP N <input type="number" value="10" style="width:50px;background:#18181a;border:1px solid rgba(80,80,85,0.3);border-radius:3px;color:#d4d4d8;padding:4px 6px;font:inherit;font-size:12px;"></span>
+      </div>
+
+      <table class="demo-c__table">
+        <thead>
+          <tr><th>Rank</th><th>Symbol</th><th>Ret_1d</th><th>Ret_5d</th><th>RVol_20</th><th>Score</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td class="sym">QLD</td><td class="pos">+2.30%</td><td class="pos">+5.12%</td><td>1.45</td><td>78.5</td></tr>
+          <tr><td>2</td><td class="sym">TQQQ</td><td class="pos">+1.80%</td><td class="pos">+4.73%</td><td>0.92</td><td>72.1</td></tr>
+          <tr><td>3</td><td class="sym">FAS</td><td class="pos">+1.25%</td><td class="pos">+3.88%</td><td>0.88</td><td>68.3</td></tr>
+          <tr><td>4</td><td class="sym">UPRO</td><td class="pos">+0.97%</td><td class="pos">+3.14%</td><td>0.76</td><td>65.0</td></tr>
+          <tr><td>5</td><td class="sym">SSO</td><td class="pos">+0.68%</td><td class="pos">+2.47%</td><td>0.71</td><td>62.4</td></tr>
+        </tbody>
+      </table>
+
+      <div class="demo-c__config-panel visible" id="config-panel">
+        <h4>⚙️ Configure Columns &mdash; Momentum Longs</h4>
+        <div>
+          <label class="demo-c__config-col"><input type="checkbox" checked> Rank</label>
+          <label class="demo-c__config-col"><input type="checkbox" checked> Symbol</label>
+          <label class="demo-c__config-col"><input type="checkbox"> Display Name</label>
+          <label class="demo-c__config-col"><input type="checkbox" checked> Ret_1d</label>
+          <label class="demo-c__config-col"><input type="checkbox" checked> Ret_5d</label>
+          <label class="demo-c__config-col"><input type="checkbox"> Ret_10d</label>
+          <label class="demo-c__config-col"><input type="checkbox" checked> RVol_20</label>
+          <label class="demo-c__config-col"><input type="checkbox" checked> Score</label>
+          <label class="demo-c__config-col"><input type="checkbox"> ZScore</label>
+          <label class="demo-c__config-col"><input type="checkbox"> Location</label>
+        </div>
+        <div style="margin-top:12px;">
+          <button style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:6px 18px;border-radius:4px;font:inherit;font-size:12px;font-weight:700;cursor:default;">Save</button>
+          <button onclick="toggleConfig()" style="background:transparent;border:1px solid rgba(80,80,85,0.3);color:#90909a;padding:6px 18px;border-radius:4px;font:inherit;font-size:12px;cursor:default;margin-left:8px;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pros-cons">
+    <div>
+      <h4 class="pro">Pros</h4>
+      <ul>
+        <li>Maximum horizontal space — no sidebar or multi-card layout</li>
+        <li>Focused view: user sees exactly one section at a time</li>
+        <li>Inline config eliminates the separate /config page</li>
+        <li>Fast — only one section's data fetched at a time</li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="con">Cons</h4>
+      <ul>
+        <li>No at-a-glance overview — must switch to compare</li>
+        <li>Requires a JS dropdown + config panel (medium effort)</li>
+        <li>May frustrate users who want Longs &amp; Shorts side by side</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!--  COMPARISON TABLE                                             -->
+<!-- ============================================================ -->
+<h2 id="comparison">Comparison Matrix</h2>
+
+<table class="comparison">
+  <thead>
+    <tr>
+      <th>Criteria</th>
+      <th>A &middot; Sticky Sidebar</th>
+      <th>B &middot; Accordion Groups</th>
+      <th>C &middot; Dropdown Switcher</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>At-a-glance overview</td>
+      <td><span class="check">&#x2713;</span> All sections visible</td>
+      <td><span class="check">&#x2713;</span> All sections visible</td>
+      <td><span class="cross">&#x2717;</span> One at a time</td>
+    </tr>
+    <tr>
+      <td>Horizontal table space</td>
+      <td><span class="warn2">&#x26A0;</span> Reduced by ~200px</td>
+      <td><span class="check">&#x2713;</span> Full width</td>
+      <td><span class="check">&#x2713;</span> Full width</td>
+    </tr>
+    <tr>
+      <td>Config access</td>
+      <td><span class="check">&#x2713;</span> In sidebar</td>
+      <td><span class="check">&#x2713;</span> In group strip</td>
+      <td><span class="check">&#x2713;</span> Inline modal</td>
+    </tr>
+    <tr>
+      <td>Mobile friendliness</td>
+      <td><span class="warn2">&#x26A0;</span> Collapses to tab bar</td>
+      <td><span class="check">&#x2713;</span> Works as-is</td>
+      <td><span class="check">&#x2713;</span> Dropdown is mobile-friendly</td>
+    </tr>
+    <tr>
+      <td>Implementation effort</td>
+      <td><span class="effort-high">&#x25CF; High</span> (layout refactor + CSS)</td>
+      <td><span class="effort-med">&#x25CF; Medium</span> (groups + sticky strip)</td>
+      <td><span class="effort-med">&#x25CF; Medium</span> (dropdown + config panel)</td>
+    </tr>
+    <tr>
+      <td>Future scalability (10+ sections)</td>
+      <td><span class="warn2">&#x26A0;</span> Sidebar gets long</td>
+      <td><span class="check">&#x2713;</span> Groups scale well</td>
+      <td><span class="check">&#x2713;</span> Dropdown scales well</td>
+    </tr>
+    <tr>
+      <td>Familiarity to finance users</td>
+      <td>Terminal dashboards</td>
+      <td>Research platforms</td>
+      <td>Screening tools</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!--  RECOMMENDATION                                               -->
+<!-- ============================================================ -->
+<div class="rec" id="recommendation">
+  <h3>Recommendation: B &middot; Accordion Groups</h3>
+  <p>
+    <strong>Suggestion B</strong> is the most practical starting point given the current codebase.
+    It works within the existing single-column HTML + CSS template, requiring no layout refactor.
+    The sticky group strip adds minimal JS (scroll-into-view on click). Grouping the 5 existing
+    sections into 3 groups (Momentum, Reversion, Compression) provides immediate navigational value.
+    Config can be added as a pill in the strip, keeping the separate /config page as a fallback.
+    As new sections are added (e.g. sector momentum, commodity trends), the group model scales naturally.
+  </p>
+</div>
+
+<div class="footer">
+  qDash &middot; Navigation Design &middot; 2026-05-10
+</div>
+
+</div>
+
+<script>
+function toggleConfig() {
+  var panel = document.getElementById('config-panel');
+  if (panel) {
+    panel.classList.toggle('visible');
+  }
+}
+</script>
+</body>
+</html>
