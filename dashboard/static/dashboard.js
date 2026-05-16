@@ -90,26 +90,15 @@ function renderSection(section, rows, limitValue) {
   const sectionControls = `<form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form>`;
   const cardId = sectionAnchorId(section.key);
   if (!rows.length) {
-    return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">No qualifying rows for the selected date.</div></div>`;
+    return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div></div><div class="etf-report__empty">No qualifying rows for the selected date.</div></div>`;
   }
-
-  const asOfDate = rows[0].date;
-  const marketRegime = rows[0].market_regime;
   const headerHtml = section.columns
     .map((column, idx) => `<th data-sort-index="${idx}" data-sort-direction="">${escapeHtml(section.column_labels[column] ?? column)}<span class="etf-report__sort-indicator"></span></th>`)
     .join("");
   const bodyHtml = rows
     .map((row) => `<tr>${section.columns.map((column) => renderCell(column, row)).join("")}</tr>`)
     .join("");
-  const badges = [
-    `<span class="etf-report__badge">As of ${escapeHtml(asOfDate)}</span>`,
-    `<span class="etf-report__badge">${rows.length} rows</span>`,
-  ];
-  if (marketRegime) {
-    badges.splice(1, 0, `<span class="etf-report__badge">Market Regime: ${escapeHtml(marketRegime)}</span>`);
-  }
-
-  return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p><div class="etf-report__card-meta">${badges.join("")}</div></div><div class="etf-report__table-wrap"><table class="etf-report__table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
+  return `<div class="etf-report__card" id="${escapeHtml(cardId)}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2>${sectionControls}</div></div><div class="etf-report__table-wrap"><table class="etf-report__table"><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div></div>`;
 }
 
 function initTableSorters(root) {
@@ -164,17 +153,19 @@ function initTableSorters(root) {
   });
 }
 
-function initEyebrowClock() {
-  const eyebrow = document.querySelector(".etf-report__eyebrow");
-  if (!eyebrow) return;
+function updateStatusClock() {
+  const el = document.querySelector("[data-status-time]");
+  if (!el) return;
   const now = new Date();
-  const date = now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-  const time = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-  eyebrow.textContent = `${date} · ${time}`;
+  const date = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  const time = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true });
+  el.textContent = `${date} ${time}`;
 }
 
+setInterval(updateStatusClock, 1000);
+
 document.addEventListener("DOMContentLoaded", function () {
-  initEyebrowClock();
+  updateStatusClock();
 
   const container = document.querySelector("[data-etf-report]");
   if (!container) return;
@@ -194,10 +185,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function setMeta(dateValue) {
     if (input && dateValue) input.value = dateValue;
+    const statusDate = document.querySelector("[data-status-date]");
+    if (statusDate && dateValue) statusDate.textContent = dateValue;
   }
 
   function renderLoadingCard(section, message, limitValue) {
-    return `<div class="etf-report__card" id="${escapeHtml(sectionAnchorId(section.key))}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2><form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form></div><p class="etf-report__card-desc">${escapeHtml(section.description)}</p></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
+    return `<div class="etf-report__card" id="${escapeHtml(sectionAnchorId(section.key))}" data-section-card="${escapeHtml(section.key)}"><div class="etf-report__card-head"><div class="etf-report__card-title-row"><h2 class="etf-report__card-title">${escapeHtml(section.title)}</h2><form class="etf-report__section-filter" data-section-filter-form data-section-key="${escapeHtml(section.key)}"><label class="etf-report__section-filter-label" for="top-n-${escapeHtml(section.key)}">TOP N</label><input class="etf-report__section-filter-input" id="top-n-${escapeHtml(section.key)}" type="number" inputmode="numeric" min="1" step="1" name="limit" value="${escapeHtml(limitValue)}"></form></div></div><div class="etf-report__empty">${escapeHtml(message)}</div></div>`;
   }
 
   function renderLoadingState() {

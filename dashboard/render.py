@@ -42,15 +42,14 @@ def render_fragment(
     loading_sections = "".join(
         (
             f"<div class='etf-report__card' id='section-{escape(section.key)}'>"
-            f"<div class='etf-report__card-head'><h2 class='etf-report__card-title'>{escape(section.title)}</h2>"
-            f"<p class='etf-report__card-desc'>{escape(section.description)}</p></div>"
+            f"<div class='etf-report__card-head'><h2 class='etf-report__card-title'>{escape(section.title)}</h2></div>"
             "<div class='etf-report__empty'>Loading data…</div>"
             "</div>"
         )
         for section in sections
     )
-    toc_links = "".join(
-        f"<a class='etf-report__toc-link' href='#section-{escape(section.key)}'>{escape(section.title)}</a>"
+    section_links = "".join(
+        f"<a class='etf-report__utility-link' href='#section-{escape(section.key)}'>{escape(section.title)}</a>"
         for section in sections
     )
 
@@ -58,35 +57,41 @@ def render_fragment(
 <link rel="stylesheet" href="/static/dashboard.css">
 <section class="etf-report" data-etf-report data-sections='{sections_json}' data-initial-date="{date_value}">
   <div class="etf-report__utility-bar">
-    <div class="etf-report__utility-label">Operations</div>
     <div class="etf-report__utility-links">
-      <a class="etf-report__utility-link" href="/pull_stats">Pull Stats</a>
       <a class="etf-report__utility-link" href="/macro-signals">Macro Signals</a>
+      <span class="etf-report__utility-divider" aria-hidden="true"></span>
+      {section_links}
+      <span class="etf-report__utility-divider" aria-hidden="true"></span>
+      <a class="etf-report__utility-link" href="/pull_stats">Pull Stats</a>
       <a class="etf-report__utility-link" href="/config">Config</a>
     </div>
   </div>
   <div class="etf-report__hero">
     <div>
-      <div class="etf-report__eyebrow">{escape(site_config.get('eyebrow', 'Momentum Snapshot'))}</div>
       <h1 class="etf-report__title">{escape(site_config.get('title', 'ETF Ranking Dashboard'))}</h1>
-      <p class="etf-report__subtitle">{escape(site_config.get('subtitle', ''))}</p>
-    </div>
-    <div class="etf-report__meta">
-      {f'<span class="etf-report__env-badge etf-report__env-badge--db">{escape((db_config or {}).get("dbname", ""))}</span>' if (db_config or {}).get("dbname") else ""}
-      <span class="etf-report__env-badge etf-report__env-badge--{escape(site_config.get('environment', 'dev'))}">{escape(site_config.get('environment', 'dev'))}</span>
-      <form class="etf-report__filter-form" method="get" data-etf-filter-form>
-        <input class="etf-report__date-input" type="date" name="date" value="{date_value}" onchange="this.form.submit()">
-      </form>
     </div>
   </div>
-  <nav class="etf-report__toc" aria-label="Table of contents">
-    <div class="etf-report__toc-label">Sections</div>
-    <div class="etf-report__toc-links">
-      <a class="etf-report__toc-link" href="/macro-signals">Macro Signals</a>
-      {toc_links}
-    </div>
-  </nav>
-
+  <div class="etf-report__status-bar">
+    <span class="etf-report__status-time" data-status-time>--</span>
+    <span class="etf-report__status-sep" aria-hidden="true">·</span>
+    <span class="etf-report__status-item">
+      <span class="etf-report__status-key">DB</span>
+      <span class="etf-report__status-value">{escape((db_config or {}).get("dbname", "") or "--")}</span>
+    </span>
+    <span class="etf-report__status-sep" aria-hidden="true">·</span>
+    <span class="etf-report__status-item">
+      <span class="etf-report__status-key">ENV</span>
+      <span class="etf-report__status-value etf-report__status-value--{escape(site_config.get('environment', 'dev'))}">{escape(site_config.get('environment', 'dev'))}</span>
+    </span>
+    <span class="etf-report__status-sep" aria-hidden="true">·</span>
+    <span class="etf-report__status-item">
+      <span class="etf-report__status-key">Date</span>
+      <span class="etf-report__status-value" data-status-date>{date_value or "--"}</span>
+    </span>
+    <form class="etf-report__filter-form" method="get" data-etf-filter-form>
+      <input class="etf-report__date-input" type="date" name="date" value="{date_value}" onchange="this.form.submit()">
+    </form>
+  </div>
   <div class="etf-report__grid" data-etf-grid>
     {loading_sections}
   </div>
@@ -104,7 +109,7 @@ def render_document(fragment: str, title: str) -> str:
   <title>{escape(title)}</title>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 </head>
-<body style="margin:0; padding:24px; background:#030712;">
+<body>
 {fragment}
 </body>
 </html>

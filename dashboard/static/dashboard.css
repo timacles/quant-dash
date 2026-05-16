@@ -1,12 +1,13 @@
 /* === qDash Dark Matrix — Refined Readability === */
 
-html,
-body {
-  background: #0c0c0c !important;
+html {
   margin: 0;
 }
 
-.etf-report {
+body {
+  margin: 0;
+  color-scheme: dark;
+
   --bg: #0c0c0c;
   --panel: #18181a;
   --panel-2: #121214;
@@ -34,19 +35,19 @@ body {
   --matrix-dim: rgba(74, 222, 128, 0.05);
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(74, 222, 128, 0.04);
   color: var(--text);
+  font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", "Menlo", monospace;
+  font-size: 14px;
+  line-height: 1.55;
   background:
     linear-gradient(rgba(74, 222, 128, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(74, 222, 128, 0.015) 1px, transparent 1px),
     linear-gradient(180deg, #0c0c0c 0%, #0a0a0c 100%);
   background-size: 32px 32px, 32px 32px, auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  padding: 28px;
-  font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", "Menlo", monospace;
-  font-size: 14px;
-  line-height: 1.55;
-  color-scheme: dark;
+}
+
+.etf-report {
+  /* BEM namespace — no visual container styling */
+  scroll-behavior: smooth;
 }
 
 .etf-report * {
@@ -71,7 +72,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
   margin-bottom: 22px;
   padding: 12px 16px;
@@ -95,36 +96,125 @@ body {
 }
 
 .etf-report__utility-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 12px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--surface);
-  color: var(--text);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .etf-report__utility-link:hover,
 .etf-report__utility-link:focus-visible {
-  border-color: var(--accent);
-  background: var(--panel);
   color: var(--accent);
+}
+
+.etf-report__utility-divider {
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  background: var(--accent);
+  flex-shrink: 0;
+  opacity: 0.35;
+}
+
+/* ===== Status bar ===== */
+
+.etf-report__status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.etf-report__status-time {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.25);
+}
+
+.etf-report__status-sep {
+  color: var(--line);
+  font-size: 14px;
+  user-select: none;
+}
+
+.etf-report__status-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.etf-report__status-key {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.etf-report__status-value {
+  color: var(--text-bright);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.etf-report__status-value--dev {
+  color: var(--warn);
+}
+
+.etf-report__status-value--prod {
+  color: var(--accent);
+}
+
+.etf-report__status-bar .etf-report__date-input {
+  border: none;
+  background: none;
+  padding: 0 2px;
+  color: var(--text-bright);
+  font-size: 12px;
+  font-weight: 600;
+  height: auto;
+  width: auto;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.etf-report__status-bar .etf-report__date-input:hover {
+  border: none;
+  color: var(--accent);
+}
+
+.etf-report__status-bar .etf-report__date-input:focus-visible {
+  border: none;
+  box-shadow: none;
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+  color: var(--accent);
+}
+
+.etf-report__status-bar .etf-report__filter-form {
+  display: inline-flex;
+  padding: 0;
 }
 
 /* ===== Hero ===== */
 
 .etf-report__hero {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: end;
+  text-align: center;
   margin-bottom: 24px;
+}
+
+.etf-report__hero > div {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .etf-report__eyebrow {
@@ -137,10 +227,10 @@ body {
 }
 
 .etf-report__title {
-  margin: 0;
-  font-size: clamp(30px, 4vw, 40px);
+  margin: 8px 0 0;
+  font-size: clamp(32px, 4.5vw, 46px);
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--text-bright);
 }
 
@@ -679,10 +769,6 @@ body {
 
 /* ===== Scroll behavior ===== */
 
-.etf-report {
-  scroll-behavior: smooth;
-}
-
 .etf-report__card[id^="section-"] {
   scroll-margin-top: 20px;
 }
@@ -693,11 +779,6 @@ body {
   .etf-report {
     padding: 16px;
     border-radius: 6px;
-  }
-
-  .etf-report__hero {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .etf-report__meta {
