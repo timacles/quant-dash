@@ -5,24 +5,16 @@ This directory is for a quant momentum dashboard to assist with trading.
 
 # Structure
 
-## Front End 
+## Repository Layout
 
-  - serve_dashboard.py 
-  - `dashboard/` 
+  - `serve_dashboard.py`: WSGI entrypoint for the dashboard application.
+  - `dashboard/`: dashboard application code and static frontend assets.
+  - `sql/`: database schema and SQL support files.
+  - `docs/`: generated human-readable HTML documentation. Output only; not a source of agent instructions.
+  - `instructions/`: task-specific instruction files for LLM agents. Read only when explicitly directed.
+  - `helpers/`: maintenance and support scripts.
 
-## Database Schema
 
-  - `sql/` directory
-
-## Other
-
-  - `docs/` human readable documenetation stored in HTML files. Not for LLM consumption, output only.
-  - `instructions/` various instruction files for LLM agents. This will be explicitly asked to be read.
-  - `helpers/` scripts to assist with maintenance.
-
-# Name
-
-qDash, Quant Dashboard.
 
 # Rules
 
@@ -53,8 +45,3 @@ so the dashboard shows current data. A single PL/pgSQL function handles this:
 ```sql
 SELECT refresh_etf_matviews();
 ```
-
-
-
-
-
