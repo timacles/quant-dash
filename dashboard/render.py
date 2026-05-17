@@ -84,10 +84,6 @@ def render_fragment(
       <span class="etf-report__status-value etf-report__status-value--{escape(site_config.get('environment', 'dev'))}">{escape(site_config.get('environment', 'dev'))}</span>
     </span>
     <span class="etf-report__status-sep" aria-hidden="true">·</span>
-    <span class="etf-report__status-item">
-      <span class="etf-report__status-key">Date</span>
-      <span class="etf-report__status-value" data-status-date>{date_value or "--"}</span>
-    </span>
     <form class="etf-report__filter-form" method="get" data-etf-filter-form>
       <input class="etf-report__date-input" type="date" name="date" value="{date_value}" onchange="this.form.submit()">
     </form>

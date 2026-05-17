@@ -178,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const button = form ? form.querySelector("button[type='submit']") : null;
   const analysisContainer = document.querySelector("[data-etf-analysis]");
   const sectionLimits = Object.fromEntries(sections.map((section) => [section.key, DEFAULT_SECTION_LIMIT]));
+  let usingLatest = !container.dataset.initialDate;
 
   function getSectionByKey(sectionKey) {
     return sections.find((section) => section.key === sectionKey);
@@ -185,8 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function setMeta(dateValue) {
     if (input && dateValue) input.value = dateValue;
-    const statusDate = document.querySelector("[data-status-date]");
-    if (statusDate && dateValue) statusDate.textContent = dateValue;
   }
 
   function renderLoadingCard(section, message, limitValue) {
@@ -262,13 +261,15 @@ async function loadSections(dateValue) {
         analysisContainer.innerHTML = renderAnalysisCard(payload.analysis || null);
       }
 
-      const pageUrl = new URL(window.location.href);
-      if (payload.date) {
-        pageUrl.searchParams.set("date", payload.date);
-      } else {
-        pageUrl.searchParams.delete("date");
+      if (!usingLatest) {
+        const pageUrl = new URL(window.location.href);
+        if (payload.date) {
+          pageUrl.searchParams.set("date", payload.date);
+        } else {
+          pageUrl.searchParams.delete("date");
+        }
+        window.history.replaceState({}, "", pageUrl);
       }
-      window.history.replaceState({}, "", pageUrl);
     } catch (error) {
       renderErrorState(error instanceof Error ? error.message : String(error));
     } finally {
@@ -332,7 +333,6 @@ async function loadSections(dateValue) {
 
       const payload = await response.json();
       const resolvedDate = payload.date || "";
-      if (input && resolvedDate) input.value = resolvedDate;
       setMeta(resolvedDate);
       return resolvedDate;
     } catch (error) {
@@ -343,6 +343,7 @@ async function loadSections(dateValue) {
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
+      usingLatest = false;
       loadSections(input ? input.value : "");
     });
   }

@@ -251,7 +251,8 @@ def route_api_config_section_columns(query: dict[str, list[str]], start_response
 def route_index(query: dict[str, list[str]], start_response: Any) -> list[bytes]:
     try:
         config = load_config()
-        report_date = query.get("date", [None])[0]
+        raw_date = query.get("date", [None])[0]
+        report_date = None if raw_date in (None, "latest") else raw_date
         connect_kwargs = build_connection_kwargs(config)
         with psycopg2.connect(**connect_kwargs) as conn:
             display_configs = fetch_section_display_configs(conn, SECTIONS)
