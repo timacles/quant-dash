@@ -1,8 +1,24 @@
 # AGENTS.md
 
 This directory is for a quant momentum dashboard to assist with trading.
-The backbone of this structure is the database table `etf_flows`, which contains
-daily OHLCV data for a universe of ETFs defined in `etf_universe`.
+
+
+# Structure
+
+## Front End 
+
+  - serve_dashboard.py 
+  - `dashboard/` 
+
+## Database Schema
+
+  - `sql/` directory
+
+## Other
+
+  - `docs/` human readable documenetation stored in HTML files. Not for LLM consumption, output only.
+  - `instructions/` various instruction files for LLM agents. This will be explicitly asked to be read.
+  - `helpers/` scripts to assist with maintenance.
 
 # Name
 
@@ -12,12 +28,12 @@ qDash, Quant Dashboard.
 
  - Small logical changes only.
  - All changes must be presented with a DIFF and reviewed for approval.
- - 
-
+ - use `git diff --` and `git status --short`  to present changes
 
 ---
 
 # Project Architecture
+
 - Backend: Python 3.12 (`venv` at `.venv/`; always use `.venv/bin/python3`)
   - `serve_dashboard.py`: thin WSGI entrypoint — app router + `main()` only.
     - Run: `.venv/bin/python3 serve_dashboard.py`
@@ -26,7 +42,6 @@ qDash, Quant Dashboard.
   - PROD: `host=192.168.50.5 dbname=financials`
   - Connect via psycopg2 (credentials in `config.toml`)
 - Config: `config.toml` (see `config.example.toml` for structure)
-  - `[database.dev]` / `[database.prod]` — `host`, `dbname`, `user`
 
 ---
 
@@ -39,8 +54,7 @@ so the dashboard shows current data. A single PL/pgSQL function handles this:
 SELECT refresh_etf_matviews();
 ```
 
-Definition: `sql/materialized_views.sql` (search for
-`CREATE OR REPLACE FUNCTION public.refresh_etf_matviews`).
+
 
 
 
