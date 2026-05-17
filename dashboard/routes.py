@@ -16,6 +16,7 @@ from .config import PULL_STATS_PATH, BASE_DIR, load_config, build_connection_kwa
 from .db import (
     fetch_all_section_configs,
     fetch_analysis_row,
+    fetch_json_views,
     fetch_latest_report_date,
     fetch_macro_summary,
     fetch_section_all_columns,
@@ -36,6 +37,7 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 _PULL_STATS_PAGE: str = (_TEMPLATES_DIR / "pull_stats.html").read_text(encoding="utf-8")
 _CONFIG_PAGE: str = (_TEMPLATES_DIR / "config.html").read_text(encoding="utf-8")
 _MACRO_SIGNALS_PAGE: str = (_TEMPLATES_DIR / "macro_signals.html").read_text(encoding="utf-8")
+_JSON_VIEWS_PAGE: str = (_TEMPLATES_DIR / "json_views.html").read_text(encoding="utf-8")
 
 _STATIC_MIME: dict[str, str] = {
     ".css": "text/css; charset=utf-8",
@@ -106,6 +108,23 @@ def route_pull_stats_stream(query: dict[str, list[str]], start_response: Any) ->
         ],
     )
     return _stream_pull_stats(query)
+
+
+def route_json_views_page(start_response: Any) -> list[bytes]:
+    start_response("200 OK", [("Content-Type", "text/html; charset=utf-8")])
+    return [_JSON_VIEWS_PAGE.encode("utf-8")]
+
+
+def route_api_json_views(start_response: Any) -> list[bytes]:
+    try:
+        config = load_config()
+        connect_kwargs = build_connection_kwargs(config)
+        with psycopg2.connect(**connect_kwargs) as conn:
+            payload = fetch_json_views(conn)
+        start_response("200 OK", [("Content-Type", "application/json; charset=utf-8")])
+        return [json.dumps(payload).encode("utf-8")]
+    except Exception as exc:
+        return json_error(start_response, "500 Internal Server Error", str(exc))
 
 
 def route_api_latest_date(start_response: Any) -> list[bytes]:

@@ -13,6 +13,7 @@ from dashboard.routes import (
     route_api_config_get,
     route_api_config_section_columns,
     route_api_config_update,
+    route_api_json_views,
     route_api_latest_date,
     route_api_macro_summary,
     route_api_section,
@@ -20,6 +21,7 @@ from dashboard.routes import (
     route_config_page,
     route_healthz,
     route_index,
+    route_json_views_page,
     route_macro_signals_page,
     route_pull_stats_page,
     route_pull_stats_stream,
@@ -50,6 +52,9 @@ def app(environ: dict[str, Any], start_response: Any) -> Any:
     if path == "/macro-signals":
         return route_macro_signals_page(start_response)
 
+    if path == "/json-views":
+        return route_json_views_page(start_response)
+
     if path == "/api/macro-summary":
         query = parse_qs(environ.get("QUERY_STRING", ""))
         return route_api_macro_summary(query, start_response)
@@ -68,6 +73,9 @@ def app(environ: dict[str, Any], start_response: Any) -> Any:
     if path == "/pull_stats/stream":
         query = parse_qs(environ.get("QUERY_STRING", ""))
         return route_pull_stats_stream(query, start_response)
+
+    if path == "/api/json-views":
+        return route_api_json_views(start_response)
 
     if path == "/api/latest-date":
         return route_api_latest_date(start_response)

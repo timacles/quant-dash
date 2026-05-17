@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON Views — qDash</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/dashboard.css">
+  <style>
+    .json-views__grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .json-views__toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .json-views__pre {
+      margin: 0;
+      padding: 18px;
+      border-radius: 6px;
+      border: 1px solid var(--line-subtle);
+      background: var(--panel-2);
+      font-family: "IBM Plex Mono", "SFMono-Regular", "Consolas", monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 80vh;
+      overflow: auto;
+    }
+
+    .json-views__copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .json-views__copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .json-views__copy-btn:active {
+      background: var(--matrix-dim);
+    }
+
+    .json-views__copy-btn--copied {
+      border-color: var(--good);
+      color: var(--good);
+    }
+
+    .json-views__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .json-views__badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .json-views__badge-dot--ok {
+      background: var(--good);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+    }
+
+    .json-views__badge-dot--empty {
+      background: var(--warn);
+      box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
+    }
+
+    .json-views__badge-dot--error {
+      background: var(--bad);
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+    }
+  </style>
+</head>
+<body>
+    <div class="etf-report__utility-bar">
+      <div class="etf-report__utility-label">JSON Views</div>
+      <div class="etf-report__utility-links">
+        <a class="etf-report__utility-link" href="/">&larr; Dashboard</a>
+        <span class="etf-report__utility-divider"></span>
+        <a class="etf-report__utility-link" href="/macro-signals">Macro Signals</a>
+      </div>
+    </div>
+
+    <div class="etf-report__hero">
+      <div>
+        <div class="etf-report__eyebrow">LLM / API Consumption</div>
+        <h1 class="etf-report__title">JSON Views</h1>
+        <p class="etf-report__subtitle">Self-contained JSON snapshots of the latest macro signals and ETF reports. Use the copy buttons to grab the raw JSON for LLM prompts or external tools.</p>
+      </div>
+      <div class="etf-report__meta">
+        <button class="json-views__copy-btn" data-refresh-btn>&#x21bb; Refresh</button>
+      </div>
+    </div>
+
+    <div class="json-views__grid" id="json-views-grid">
+      <div class="etf-report__card">
+        <div class="etf-report__card-head">
+          <div class="etf-report__card-title-row">
+            <h2 class="etf-report__card-title">vw_json_macro_signal_table</h2>
+            <div class="json-views__toolbar">
+              <span class="json-views__badge" data-macro-badge><span class="json-views__badge-dot"></span> <span data-macro-status>loading</span></span>
+              <button class="json-views__copy-btn" data-copy-btn="macro" title="Copy to clipboard">&#x1F4CB; Copy</button>
+            </div>
+          </div>
+          <p class="etf-report__card-desc">Latest-day snapshot of all macro signals, grouped by category.</p>
+        </div>
+        <pre class="json-views__pre" data-macro-pre>Loading data…</pre>
+      </div>
+
+      <div class="etf-report__card">
+        <div class="etf-report__card-head">
+          <div class="etf-report__card-title-row">
+            <h2 class="etf-report__card-title">vw_json_etf_reports</h2>
+            <div class="json-views__toolbar">
+              <span class="json-views__badge" data-etf-badge><span class="json-views__badge-dot"></span> <span data-etf-status>loading</span></span>
+              <button class="json-views__copy-btn" data-copy-btn="etf" title="Copy to clipboard">&#x1F4CB; Copy</button>
+            </div>
+          </div>
+          <p class="etf-report__card-desc">Latest-day snapshot of ranked ETF reports — momentum, mean reversion, and range compression.</p>
+        </div>
+        <pre class="json-views__pre" data-etf-pre>Loading data…</pre>
+      </div>
+    </div>
+
+  <script>
+    (function () {
+      var preMacro = document.querySelector("[data-macro-pre]");
+      var preEtf   = document.querySelector("[data-etf-pre]");
+      var macroStatus = document.querySelector("[data-macro-status]");
+      var etfStatus   = document.querySelector("[data-etf-status]");
+      var macroBadge  = document.querySelector("[data-macro-badge] .json-views__badge-dot");
+      var etfBadge    = document.querySelector("[data-etf-badge] .json-views__badge-dot");
+      var refreshBtn  = document.querySelector("[data-refresh-btn]");
+
+      var macroText = "";
+      var etfText   = "";
+
+      function setBadge(el, status) {
+        el.className = "json-views__badge-dot json-views__badge-dot--" + status;
+      }
+
+      function copyToClipboard(text, btn) {
+        if (!text || text === "null" || text === "undefined") {
+          btn.textContent = "\u274c Empty";
+          btn.classList.add("json-views__copy-btn--copied");
+          setTimeout(function () {
+            btn.textContent = "\u{1F4CB} Copy";
+            btn.classList.remove("json-views__copy-btn--copied");
+          }, 1500);
+          return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = "\u2713 Copied!";
+          btn.classList.add("json-views__copy-btn--copied");
+          setTimeout(function () {
+            btn.textContent = "\u{1F4CB} Copy";
+            btn.classList.remove("json-views__copy-btn--copied");
+          }, 2000);
+        }).catch(function () {
+          btn.textContent = "\u274c Failed";
+          setTimeout(function () {
+            btn.textContent = "\u{1F4CB} Copy";
+          }, 2000);
+        });
+      }
+
+      document.querySelectorAll("[data-copy-btn]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var target = btn.dataset.copyBtn;
+          var text = target === "macro" ? macroText : etfText;
+          copyToClipboard(text, btn);
+        });
+      });
+
+      function loadJsonViews() {
+        preMacro.textContent = "Loading data\u2026";
+        preEtf.textContent   = "Loading data\u2026";
+        macroStatus.textContent = "loading";
+        etfStatus.textContent   = "loading";
+        setBadge(macroBadge, "empty");
+        setBadge(etfBadge, "empty");
+
+        fetch("/api/json-views")
+          .then(function (resp) {
+            if (!resp.ok) throw new Error("Request failed with status " + resp.status);
+            return resp.json();
+          })
+          .then(function (payload) {
+            if (payload.macro_signal_table != null) {
+              macroText = JSON.stringify(payload.macro_signal_table, null, 2);
+              preMacro.textContent = macroText;
+              macroStatus.textContent = "ready";
+              setBadge(macroBadge, "ok");
+            } else {
+              preMacro.textContent = "No macro signal data found.";
+              macroText = "";
+              macroStatus.textContent = "empty";
+              setBadge(macroBadge, "empty");
+            }
+
+            if (payload.etf_reports != null) {
+              etfText = JSON.stringify(payload.etf_reports, null, 2);
+              preEtf.textContent = etfText;
+              etfStatus.textContent = "ready";
+              setBadge(etfBadge, "ok");
+            } else {
+              preEtf.textContent = "No ETF report data found.";
+              etfText = "";
+              etfStatus.textContent = "empty";
+              setBadge(etfBadge, "empty");
+            }
+          })
+          .catch(function (err) {
+            preMacro.textContent = "Error: " + err.message;
+            preEtf.textContent   = "Error: " + err.message;
+            macroStatus.textContent = "error";
+            etfStatus.textContent   = "error";
+            setBadge(macroBadge, "error");
+            setBadge(etfBadge, "error");
+          });
+      }
+
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", loadJsonViews);
+      }
+
+      loadJsonViews();
+    })();
+  </script>
+</body>
+</html>

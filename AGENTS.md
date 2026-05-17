@@ -20,6 +20,7 @@ This directory is for a quant momentum dashboard to assist with trading.
 
  - Small logical changes only.
  - All changes must be presented with a DIFF and reviewed for approval.
+ - DO NOT MAKE ANY changes before presenting a DIFF for reviewal
  - use `git diff --` and `git status --short`  to present changes
 
 ---
@@ -45,3 +46,10 @@ so the dashboard shows current data. A single PL/pgSQL function handles this:
 ```sql
 SELECT refresh_etf_matviews();
 ```
+
+
+## JSON output of data for LLM input
+
+2 database views to be used for analyzing the compiled data:
+- vw_json_etf_reports
+- vw_json_macro_signal_table

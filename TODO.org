@@ -1,45 +1,29 @@
 #+TITLE: Quant Dash 
 
 * Main 
-** JSON export 4 analysis
- - [ ] create JSON view 
- - [ ] instructions for reading?
- - [ ] contract for LLM output
-** Remove Unusued SQL Views
-script in sql folder
 ** Theme View Card
+The output for the LLM needs to be much more simplified, the 1,3,10 day returns is too many numbers.
+
+   - manually added KEY ETFs for LLM analysis
    - [ ] leader/laggards
    - [ ] theme/industry/sector
+   - Compress symbol lists into theme clusters.
+   - Compress signal categories into regime states.
+   - Compress repeated metrics into one derived score per idea.
+   - Compress static snapshots into “what changed since last run”.
+
+
 *** theme SQL view 
-** Design
- - Status bar on top:
-   - date
-   - data inconsisntecies
- - navigation
-** Split Sections Out 
-- add a section loader or just move them to separate pages
-- move the Macro section to the bottom;
-  
-** add data inconsitency alert to page
-- make the script return a flag if any critical inconsistencies are found
 
-** Design
-- add a status bar with
-  - current time,
-  - latest data date
-  - data inconsistency indicator (
-
-** Theme Dashboard
-- leaders/laggards by theme
-
+** JSON export 4 analysis
+ - [X] create JSON view 
+ - [X] instructions for reading?
+ - [X] script to generate instructions file with data and prompt llm
+ - [ ] contract for LLM output
 * Later
 ** industry leader stocks
 - scrape from finviz
 - by volume descending
-
-** ETF discrepancies endpoint
-** =pull_stats/= endpoint
-- displays last pulled
 ** JSON export to LLM analysis
    - import json -> DB from llm analysis
    - =vw_llm_market_analysis=

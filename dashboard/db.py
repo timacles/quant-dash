@@ -365,6 +365,23 @@ def fetch_section_all_columns(
     }
 
 
+def fetch_json_views(
+    conn: psycopg2.extensions.connection,
+) -> dict[str, Any]:
+    """Return data from the two vw_json_* views."""
+    result: dict[str, Any] = {}
+    with conn.cursor() as cur:
+        cur.execute('SELECT data FROM public.vw_json_macro_signal_table')
+        row = cur.fetchone()
+        result["macro_signal_table"] = row[0] if row else None
+
+        cur.execute('SELECT data FROM public.vw_json_etf_reports')
+        row = cur.fetchone()
+        result["etf_reports"] = row[0] if row else None
+
+    return result
+
+
 def fetch_analysis_row(
     conn: psycopg2.extensions.connection,
     report_date: str | None,
