@@ -1,0 +1,296 @@
+{
+  "handoff_type": "llm_input_format_optimization",
+  "generated_on": "2026-05-17",
+  "objective": "Improve the LLM input format by compressing row-level data into decision-level summaries.",
+  "source_inputs": [
+    "instructions/llm_swing_trading_analysis.md",
+    "vw_json_etf_reports",
+    "vw_json_macro_signal_table"
+  ],
+  "current_problems": [
+    {
+      "issue": "multiple_payload_blocks",
+      "detail": "The prompt mixes prose with separate ETF and macro JSON blocks, forcing the LLM to parse structure before reasoning."
+    },
+    {
+      "issue": "row_level_not_decision_level",
+      "detail": "The model receives many symbol rows but still has to infer theme concentration, leadership, distribution, and contradictions on its own."
+    },
+    {
+      "issue": "metric_redundancy",
+      "detail": "Several fields describe similar conditions, such as trend, extension, and confirmation, but are passed separately."
+    },
+    {
+      "issue": "no_precomputed_contradictions",
+      "detail": "The LLM has to discover tensions like narrow leadership or reflation without broad cyclical confirmation."
+    },
+    {
+      "issue": "flat_structure",
+      "detail": "The current format does not distinguish between summary, evidence, and optional raw detail."
+    }
+  ],
+  "what_to_compress": [
+    {
+      "component": "momentum_longs",
+      "compress_into": "theme_clusters",
+      "replace_row_dump_with": [
+        "theme",
+        "count",
+        "top_symbols",
+        "average_trend_score",
+        "average_extension_score",
+        "status"
+      ],
+      "reason": "The LLM needs to know where money is clustering, not read every long row individually."
+    },
+    {
+      "component": "momentum_shorts",
+      "compress_into": "distribution_clusters",
+      "replace_row_dump_with": [
+        "theme",
+        "count",
+        "top_symbols",
+        "average_trend_score",
+        "average_extension_score",
+        "status"
+      ],
+      "reason": "The short side is more useful as grouped weakness than as a flat list of names."
+    },
+    {
+      "component": "overbought_mean_reversion",
+      "compress_into": "overextended_leaders",
+      "replace_row_dump_with": [
+        "symbol",
+        "theme",
+        "extension_score",
+        "trend_intact"
+      ],
+      "reason": "This list should answer whether leadership is exhausted or simply extended."
+    },
+    {
+      "component": "oversold_mean_reversion",
+      "compress_into": "oversold_bounce_watch",
+      "replace_row_dump_with": [
+        "symbol",
+        "theme",
+        "extension_score",
+        "bounce_state"
+      ],
+      "reason": "The LLM only needs to know which names are oversold and whether they are stabilizing."
+    },
+    {
+      "component": "range_compression",
+      "compress_into": "setup_watchlist",
+      "replace_row_dump_with": [
+        "symbol",
+        "theme",
+        "compression_score",
+        "trend_context",
+        "setup_type"
+      ],
+      "reason": "Compression is a setup list, not a thesis list."
+    },
+    {
+      "component": "macro_signal_table",
+      "compress_into": "macro_summary_by_category",
+      "replace_row_dump_with": [
+        "category",
+        "state",
+        "strength",
+        "supporting_evidence",
+        "risk_flag"
+      ],
+      "reason": "Most macro rows are evidence for a category state, not standalone conclusions."
+    }
+  ],
+  "best_next_level_of_summarization": {
+    "goal": "Move from row-level summaries to regime-oriented summaries that mirror the final analytical questions.",
+    "layers": [
+      {
+        "name": "regime_summary",
+        "contains": [
+          "regime_label",
+          "confidence",
+          "top_macro_drivers",
+          "market_character"
+        ],
+        "why": "This gives the LLM the top-down frame first."
+      },
+      {
+        "name": "theme_rotation_summary",
+        "contains": [
+          "accumulation_themes",
+          "distribution_themes",
+          "theme_concentration",
+          "participation_quality"
+        ],
+        "why": "This tells the model where leadership and weakness are clustering."
+      },
+      {
+        "name": "contradiction_flags",
+        "contains": [
+          "signal_tension",
+          "breadth_tension",
+          "macro_tension"
+        ],
+        "why": "This saves the model from reconstructing the key conflicts itself."
+      },
+      {
+        "name": "setup_summary",
+        "contains": [
+          "trend_continuation_candidates",
+          "overextended_leaders",
+          "oversold_bounce_only",
+          "compression_watchlist"
+        ],
+        "why": "This separates tradable continuation from tactical countertrend lists."
+      },
+      {
+        "name": "raw_detail_appendix",
+        "contains": [
+          "full_rows_optional"
+        ],
+        "why": "Keep the raw data available for auditability, but make it optional."
+      }
+    ]
+  },
+  "redundant_fields_to_collapse": [
+    {
+      "raw_fields": [
+        "ret_3d",
+        "ret_5d",
+        "ret_10d",
+        "rs_5",
+        "rs_10"
+      ],
+      "collapse_to": "trend_score",
+      "meaning": "Direction and persistence of recent strength or weakness."
+    },
+    {
+      "raw_fields": [
+        "zscore_close_20",
+        "atr_stretch_20",
+        "close_location_20"
+      ],
+      "collapse_to": "extension_score",
+      "meaning": "How stretched the instrument is versus its recent range."
+    },
+    {
+      "raw_fields": [
+        "rvol_20",
+        "volume_ratio_5_20",
+        "avg_dollar_volume_20"
+      ],
+      "collapse_to": "confirmation_score",
+      "meaning": "Liquidity and volume confirmation behind the move."
+    },
+    {
+      "raw_fields": [
+        "range_compression_5_20",
+        "range_compression_5_60",
+        "atr_compression_5_20"
+      ],
+      "collapse_to": "compression_score",
+      "meaning": "How tight the setup is before a potential move."
+    }
+  ],
+  "derived_objects_to_precompute": [
+    "long_theme_clusters",
+    "short_theme_clusters",
+    "macro_category_states",
+    "breadth_state",
+    "leadership_state",
+    "risk_appetite_state",
+    "contradiction_flags",
+    "overextended_leaders",
+    "oversold_bounce_watch",
+    "compression_watchlist"
+  ],
+  "recommended_pipeline": {
+    "stage_1": {
+      "owner": "python_or_sql",
+      "responsibility": "Compute clusters, derived scores, category states, and contradictions before the LLM step."
+    },
+    "stage_2": {
+      "owner": "llm",
+      "responsibility": "Interpret the compact summary, resolve regime implications, and write the narrative or trade plan."
+    }
+  },
+  "recommended_payload_shape": {
+    "as_of": "YYYY-MM-DD",
+    "regime_summary": {
+      "label": "string",
+      "confidence": 0.0,
+      "top_macro_drivers": [
+        "string"
+      ],
+      "market_character": "string"
+    },
+    "macro_summary": [
+      {
+        "category": "rates|dollar|commodities|breadth|volatility|leading_econ",
+        "state": "string",
+        "strength": "low|medium|high",
+        "supporting_evidence": [
+          "string"
+        ],
+        "risk_flag": "optional_string"
+      }
+    ],
+    "theme_rotation_summary": {
+      "accumulation_themes": [
+        {
+          "theme": "string",
+          "count": 0,
+          "top_symbols": [
+            "string"
+          ],
+          "status": "early|mature|overextended"
+        }
+      ],
+      "distribution_themes": [
+        {
+          "theme": "string",
+          "count": 0,
+          "top_symbols": [
+            "string"
+          ],
+          "status": "early|mature|oversold"
+        }
+      ]
+    },
+    "contradiction_flags": [
+      "string"
+    ],
+    "setup_summary": {
+      "trend_continuation_candidates": [
+        "string"
+      ],
+      "overextended_leaders": [
+        "string"
+      ],
+      "oversold_bounce_only": [
+        "string"
+      ],
+      "compression_watchlist": [
+        "string"
+      ]
+    },
+    "raw_detail_appendix": {
+      "include": false
+    }
+  },
+  "prompt_level_changes": [
+    "Send one JSON object instead of prose plus multiple fenced JSON blocks.",
+    "Put summary layers before raw detail.",
+    "Make contradictions explicit in the payload.",
+    "Keep raw rows optional and append-only.",
+    "Require the LLM to distinguish observation from inference.",
+    "Define a strict response schema so the output is consistent."
+  ],
+  "handoff_notes": [
+    "The raw data is already fairly compact per row, but it is not compact per decision.",
+    "The main optimization is not deleting fields blindly; it is moving interpretation-friendly summaries upstream.",
+    "A good target is 5 to 10 summary bullets, 3 to 5 theme clusters per side, and a short contradiction list before any raw appendix."
+  ]
+}

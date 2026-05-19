@@ -17,15 +17,20 @@
 
     <div class="etf-report__hero">
       <div>
-        <div class="etf-report__eyebrow">Cross-Asset Signal Monitor</div>
         <h1 class="etf-report__title">Macro Signal Table</h1>
-        <p class="etf-report__subtitle">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p>
       </div>
-      <div class="etf-report__meta">
-        <form class="etf-report__filter-form" method="get" data-macro-filter-form>
-          <input class="etf-report__date-input" type="date" name="date" data-macro-date-input onchange="this.form.requestSubmit()">
-        </form>
-      </div>
+    </div>
+    <div class="etf-report__status-bar">
+      <span class="etf-report__status-time" data-macro-status-time>--</span>
+      <span class="etf-report__status-sep" aria-hidden="true">·</span>
+      <span class="etf-report__status-item">
+        <span class="etf-report__status-key">Signals</span>
+        <span class="etf-report__status-value" data-macro-count>--</span>
+      </span>
+      <span class="etf-report__status-sep" aria-hidden="true">·</span>
+      <form class="etf-report__filter-form" method="get" data-macro-filter-form>
+        <input class="etf-report__date-input" type="date" name="date" data-macro-date-input onchange="this.form.requestSubmit()">
+      </form>
     </div>
 
     <div class="etf-report__summary" data-macro-summary>
@@ -59,11 +64,10 @@
     function renderMacroCard(summary) {
       if (!summary || !Array.isArray(summary.rows) || !summary.rows.length) {
         var msg = summary && summary.error ? "Error: " + summary.error : "No macro signal data found for the selected date.";
-        return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">' + escapeHtml(msg) + '</div></div>';
+        return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2></div><div class="etf-report__empty">' + escapeHtml(msg) + '</div></div>';
       }
 
       var rows = summary.rows;
-      var asOfDate = summary.date || rows[0].date || "\u2014";
 
       var columns = [
         { key: "signal_name", label: "Signal" },
@@ -124,7 +128,7 @@
         }
       }
 
-      return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p><div class="etf-report__card-meta"><span class="etf-report__badge">As of ' + escapeHtml(asOfDate) + '</span><span class="etf-report__badge">' + rows.length + ' signals</span></div></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>' + headerHtml + '</tr></thead><tbody>' + bodyHtml + '</tbody></table></div></div>';
+      return '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2></div><div class="etf-report__table-wrap"><table class="etf-report__table etf-report__macro-table"><thead><tr>' + headerHtml + '</tr></thead><tbody>' + bodyHtml + '</tbody></table></div></div>';
     }
 
     function loadMacroSignals(dateValue) {
@@ -145,6 +149,12 @@
           var dateInput = document.querySelector("[data-macro-date-input]");
           if (dateInput && payload.date) dateInput.value = payload.date;
 
+          var statusTime = document.querySelector("[data-macro-status-time]");
+          if (statusTime) statusTime.textContent = payload.date || "--";
+
+          var countEl = document.querySelector("[data-macro-count]");
+          if (countEl) countEl.textContent = (payload.rows && payload.rows.length) ? payload.rows.length + " signals" : "--";
+
           var pageUrl = new URL(window.location.href);
           if (payload.date) {
             pageUrl.searchParams.set("date", payload.date);
@@ -154,7 +164,7 @@
           window.history.replaceState({}, "", pageUrl);
         })
         .catch(function (err) {
-          container.innerHTML = '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2><p class="etf-report__card-desc">Cross-asset macro signals grouped by category with change, DMA, and interpretation columns.</p></div><div class="etf-report__empty">' + escapeHtml(err.message) + '</div></div>';
+          container.innerHTML = '<div class="etf-report__card"><div class="etf-report__card-head"><h2 class="etf-report__card-title">Macro Signal Table</h2></div><div class="etf-report__empty">' + escapeHtml(err.message) + '</div></div>';
         });
     }
 
