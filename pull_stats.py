@@ -130,6 +130,10 @@ def fetch_description(symbol, api_key):
 
     while True:
         response = requests.get(url, params=params, timeout=30)
+        if response.status_code == 429:
+            logging.warning("Rate limit (HTTP 429) reached for %s; waiting 60 seconds before retry", symbol)
+            time.sleep(60)
+            continue
         response.raise_for_status()
         payload = response.json()
 
@@ -157,6 +161,10 @@ def fetch_symbol_data(symbol, api_key, start_date):
 
     while True:
         response = requests.get(url, params=params, timeout=30)
+        if response.status_code == 429:
+            logging.warning("Rate limit (HTTP 429) reached for %s; waiting 60 seconds before retry", symbol)
+            time.sleep(60)
+            continue
         response.raise_for_status()
         payload = response.json()
 

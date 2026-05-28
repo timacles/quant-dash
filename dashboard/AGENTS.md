@@ -37,3 +37,36 @@
    );
    ```
    `columns` and `column_labels` must have the same keys. Source: `sql/config_app.sql` for examples.
+
+## Macro Signals page reference
+
+**File:** `dashboard/templates/macro_signals.html`
+**Route:** `GET /macro-signals`
+**API:** `GET /api/macro-summary?date=YYYY-MM-DD` → `fetch_macro_summary()` in `db.py` (from `mv_macro_signal_table`)
+
+**HTML structure (4 sections):**
+```
+utility-bar     → nav links
+hero            → <h1> title only
+status-bar      → as-of date · signal count · date filter form  
+summary(data)   → dynamic card rendered by JS
+```
+
+**Key JS hook selectors:**
+- `data-macro-filter-form` — date form submit
+- `data-macro-date-input` — date input
+- `data-macro-summary` — card container
+- `data-macro-status-time` — as-of date in status bar
+- `data-macro-count` — signal count in status bar
+
+**`renderMacroCard(summary)` produces:**
+- Card head: `<h2>Macro Signal Table</h2>`
+- Table: grouped by `category` → group header rows → data rows with 11 columns (Signal, Source, 1D, 5D, 10D, 20D, vs20, vs50, vs200, RVol, Interpretation)
+
+**CSS classes to know:**
+- `.etf-report__macro-table` — table styling
+- `.etf-report__macro-group-row` — category group header row
+- `.etf-report__macro-signal` / `.etf-report__macro-source` / `.etf-report__macro-interp` — cell classes
+- `.etf-report__table-wrap` — scroll container (`max-height: 70vh`, `overflow: auto`)
+
+**Init flow:** Fetch `/api/latest-date` → set date input → `loadMacroSignals(date)` → render card + update status bar + sync URL param.

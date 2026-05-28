@@ -93,7 +93,8 @@ def main() -> int:
         if not db_config:
             print("Error: [database.prod] not found in config.toml", file=sys.stderr)
             return 1
-        connect_kwargs = {k: v for k, v in db_config.items() if k in ("dbname", "host", "port", "user", "password")}
+        connect_kwargs = {k: v for k, v in db_config.items() if k in ("dbname", "host", "port", "user", "password", "connect_timeout")}
+        connect_kwargs.setdefault("connect_timeout", 10)
         conn = psycopg2.connect(**connect_kwargs)
     except Exception as exc:
         print(f"Error connecting to database: {exc}", file=sys.stderr)
