@@ -261,7 +261,8 @@ def insert_symbol_rows(conn, symbol, df):
 def calculate_symbol_metrics(symbol, df):
     logging.info("Calculating 5-day metrics for %s", symbol)
     if len(df) < 5:
-        raise RuntimeError(f"Not enough data returned for {symbol}")
+        logging.warning("Not enough data returned for %s (got %d rows, need 5). Skipping.", symbol, len(df))
+        return None
 
     last5 = df.tail(5)
     ret_5d = (last5["close"].iloc[-1] / last5["close"].iloc[0] - 1) * 100
@@ -355,8 +356,12 @@ def main():
         for symbol in symbols:
             logging.info("Processing symbol %s", symbol)
             result = process_symbol(conn, symbol, api_key, start_date, print_data=args.print_data)
-            results.append(result)
+            if result is not None:
+                results.append(result)
 
+        if not results:
+            logging.warning("No symbols produced valid results.")
+            return
         df_results = pd.DataFrame(results)
         logging.info("Completed processing all symbols")
         print(df_results.sort_values("5D Return %", ascending=False))
